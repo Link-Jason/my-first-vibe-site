@@ -8,14 +8,57 @@
         body {
             margin: 0;
             font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
         }
         h1 {
             text-align: center;
+        }
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .skeleton {
+            position: absolute;
+            font-size: 20px;
+            animation: dance 1s ease-in-out infinite alternate;
+        }
+        .skeleton-left {
+            left: 20%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .skeleton-right {
+            right: 20%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        @keyframes dance {
+            0% { transform: translateY(-50%) rotate(-5deg); }
+            100% { transform: translateY(-50%) rotate(5deg); }
+        }
+        .button-container {
+            position: relative;
+            display: inline-block;
         }
     </style>
 </head>
 <body>
     <h1>Hello from the vibeside</h1>
+    <div class="button-container">
+        <div class="skeleton skeleton-left">💀</div>
+        <button>Contact Me</button>
+        <div class="skeleton skeleton-right">💀</div>
+    </div>
 </body>
 </html>
 
