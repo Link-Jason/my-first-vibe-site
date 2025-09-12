@@ -63,7 +63,7 @@
             display: flex;
             width: 40px;
             height: 40px;
-            background-color: #000000;
+            background-color: #2B2F2B;
             border: 2px solid #39FF14;
             border-radius: 4px;
             align-items: center;
@@ -103,9 +103,11 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(transparent 48%, rgba(0, 255, 255, 0.12) 50%, transparent 52%);
-            background-size: 100% 2px;
-            animation: scanlines 0.12s linear infinite;
+            background: 
+                linear-gradient(transparent 50%, rgba(0, 255, 255, 0.2) 50%),
+                linear-gradient(90deg, transparent 50%, rgba(0, 255, 255, 0.08) 50%);
+            background-size: 100% 1.5px, 3px 100%;
+            animation: scanlines 0.1s linear infinite;
             pointer-events: none;
             z-index: 1;
         }
@@ -119,9 +121,11 @@
             height: 100%;
             pointer-events: none;
             z-index: 1000;
-            background: linear-gradient(transparent 48%, rgba(0, 255, 255, 0.08) 50%, transparent 52%);
-            background-size: 100% 3px;
-            animation: scanlines 0.15s linear infinite;
+            background: 
+                linear-gradient(transparent 50%, rgba(0, 255, 255, 0.15) 50%),
+                linear-gradient(90deg, transparent 50%, rgba(0, 255, 255, 0.05) 50%);
+            background-size: 100% 2px, 4px 100%;
+            animation: scanlines 0.08s linear infinite;
         }
         
         /* Noise Texture */
@@ -141,7 +145,7 @@
         
         @keyframes scanlines {
             0% { transform: translateY(0); }
-            100% { transform: translateY(3px); }
+            100% { transform: translateY(2px); }
         }
         
         /* Pixel Icons */
