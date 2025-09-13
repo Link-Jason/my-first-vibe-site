@@ -63,7 +63,7 @@
             display: flex;
             width: 40px;
             height: 40px;
-            background-color: #2B2F2B;
+            background-color: #677872;
             border: 2px solid #39FF14;
             border-radius: 4px;
             align-items: center;
@@ -88,29 +88,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #2B2F2B;
+            background-color: transparent;
             padding: 20px;
-            border-radius: 10px;
-            border: 2px solid #FFB347;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
+            border-radius: 0;
+            border: none;
+            box-shadow: none;
+            overflow: visible;
         }
         
-        .button-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                linear-gradient(transparent 50%, rgba(0, 255, 255, 0.2) 50%),
-                linear-gradient(90deg, transparent 50%, rgba(0, 255, 255, 0.08) 50%);
-            background-size: 100% 1.5px, 3px 100%;
-            animation: scanlines 0.1s linear infinite;
-            pointer-events: none;
-            z-index: 1;
-        }
         
         /* CRT Scanline Overlay */
         .crt-overlay {
