@@ -29,10 +29,7 @@
             font-size: 20px;
         }
         button {
-            position: fixed;
-            bottom: 50px;
-            left: 50%;
-            transform: translateX(-50%);
+            position: relative;
             padding: 15px 40px;
             font-size: 16px;
             font-family: 'Press Start 2P', cursive;
@@ -84,7 +81,10 @@
             100% { transform: rotate(5deg); }
         }
         .button-container {
-            position: relative;
+            position: fixed;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -94,6 +94,7 @@
             border: none;
             box-shadow: none;
             overflow: visible;
+            z-index: 2000;
         }
         
         
@@ -209,7 +210,7 @@
 </head>
 <body>
     <h1>Hello from the vibeside</h1>
-    <p>Welcome to my first website! This site was built using AI and vibe coding - a creative approach to web development that combines artificial intelligence assistance with an intuitive, coding experience.</p>
+    <p>Welcome to my first website! This site was built using AI and vibe coding.</p>
     <div class="button-container">
         <span class="skeleton skeleton-left">💀</span>
         <button>DO NOT PRESS THIS BUTTON!</button>
