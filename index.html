@@ -140,6 +140,71 @@
             color: #39FF14;
             text-shadow: 0 0 5px #39FF14;
         }
+        
+        /* Pong Game */
+        .pong-game {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 400px;
+            background-color: #000000;
+            border: 3px solid #39FF14;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+            overflow: hidden;
+        }
+        
+        .pong-ball {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #39FF14;
+            border-radius: 2px;
+            box-shadow: 0 0 10px #39FF14;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .pong-paddle {
+            position: absolute;
+            width: 15px;
+            height: 80px;
+            background-color: #39FF14;
+            border-radius: 2px;
+            box-shadow: 0 0 8px #39FF14;
+        }
+        
+        .paddle-left {
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .paddle-right {
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .score {
+            position: absolute;
+            top: 20px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 16px;
+            color: #39FF14;
+            text-shadow: 0 0 5px #39FF14;
+        }
+        
+        .score-left {
+            left: 50px;
+        }
+        
+        .score-right {
+            right: 50px;
+        }
     </style>
 </head>
 <body>
@@ -151,9 +216,119 @@
         <span class="skeleton skeleton-right">💀</span>
     </div>
     
+    <!-- Pong Game -->
+    <div class="pong-game">
+        <div class="score score-left">0</div>
+        <div class="score score-right">0</div>
+        <div class="pong-ball" id="ball"></div>
+        <div class="pong-paddle paddle-left" id="paddleLeft"></div>
+        <div class="pong-paddle paddle-right" id="paddleRight"></div>
+    </div>
+    
     <!-- Retro Effects Overlays -->
     <div class="noise-overlay"></div>
     <div class="crt-overlay"></div>
+    
+    <script>
+        // Pong Game Logic
+        const ball = document.getElementById('ball');
+        const paddleLeft = document.getElementById('paddleLeft');
+        const paddleRight = document.getElementById('paddleRight');
+        const scoreLeft = document.querySelector('.score-left');
+        const scoreRight = document.querySelector('.score-right');
+        
+        let ballX = 300;
+        let ballY = 200;
+        let ballSpeedX = 3;
+        let ballSpeedY = 2;
+        let paddleLeftY = 160;
+        let paddleRightY = 160;
+        let paddleSpeed = 2;
+        let leftScore = 0;
+        let rightScore = 0;
+        
+        const gameWidth = 600;
+        const gameHeight = 400;
+        const ballSize = 20;
+        const paddleHeight = 80;
+        const paddleWidth = 15;
+        
+        function updateBall() {
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+            
+            // Bounce off top and bottom walls
+            if (ballY <= 0 || ballY >= gameHeight - ballSize) {
+                ballSpeedY = -ballSpeedY;
+            }
+            
+            // Bounce off paddles
+            if (ballX <= 35 && ballY + ballSize >= paddleLeftY && ballY <= paddleLeftY + paddleHeight) {
+                ballSpeedX = -ballSpeedX;
+                // Add some randomness to make it more interesting
+                ballSpeedY += (Math.random() - 0.5) * 2;
+            }
+            
+            if (ballX >= gameWidth - 35 - ballSize && ballY + ballSize >= paddleRightY && ballY <= paddleRightY + paddleHeight) {
+                ballSpeedX = -ballSpeedX;
+                ballSpeedY += (Math.random() - 0.5) * 2;
+            }
+            
+            // Reset ball if it goes off screen
+            if (ballX < 0) {
+                rightScore++;
+                scoreRight.textContent = rightScore;
+                resetBall();
+            }
+            if (ballX > gameWidth) {
+                leftScore++;
+                scoreLeft.textContent = leftScore;
+                resetBall();
+            }
+            
+            ball.style.left = ballX + 'px';
+            ball.style.top = ballY + 'px';
+        }
+        
+        function updatePaddles() {
+            // Left paddle AI - follows the ball
+            if (paddleLeftY + paddleHeight/2 < ballY) {
+                paddleLeftY += paddleSpeed;
+            } else if (paddleLeftY + paddleHeight/2 > ballY) {
+                paddleLeftY -= paddleSpeed;
+            }
+            
+            // Right paddle AI - follows the ball
+            if (paddleRightY + paddleHeight/2 < ballY) {
+                paddleRightY += paddleSpeed;
+            } else if (paddleRightY + paddleHeight/2 > ballY) {
+                paddleRightY -= paddleSpeed;
+            }
+            
+            // Keep paddles within bounds
+            paddleLeftY = Math.max(0, Math.min(gameHeight - paddleHeight, paddleLeftY));
+            paddleRightY = Math.max(0, Math.min(gameHeight - paddleHeight, paddleRightY));
+            
+            paddleLeft.style.top = paddleLeftY + 'px';
+            paddleRight.style.top = paddleRightY + 'px';
+        }
+        
+        function resetBall() {
+            ballX = gameWidth / 2;
+            ballY = gameHeight / 2;
+            ballSpeedX = (Math.random() > 0.5 ? 3 : -3);
+            ballSpeedY = (Math.random() - 0.5) * 4;
+        }
+        
+        function gameLoop() {
+            updateBall();
+            updatePaddles();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Start the game
+        gameLoop();
+    </script>
 </body>
 </html>
 
