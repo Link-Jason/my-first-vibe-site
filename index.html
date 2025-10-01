@@ -248,96 +248,119 @@
         const paddleRight = document.getElementById('paddleRight');
         const scoreLeft = document.querySelector('.score-left');
         const scoreRight = document.querySelector('.score-right');
-        
+    
         let ballX = 300;
         let ballY = 200;
         let ballSpeedX = 3;
         let ballSpeedY = 2;
         let paddleLeftY = 160;
         let paddleRightY = 160;
-        let paddleSpeed = 2;
+        let paddleSpeed = 2.5; // AI speed for right paddle
+        let userPaddleSpeed = 5; // User paddle speed (for W/S keys)
         let leftScore = 0;
         let rightScore = 0;
-        
+    
         const gameWidth = 600;
         const gameHeight = 400;
         const ballSize = 20;
         const paddleHeight = 80;
-        const paddleWidth = 15;
+    
+        // --- W/S Keyboard Control Setup ---
+        // Object to track if W or S is currently pressed for smooth movement
+        const keysPressed = {};
         
+        document.addEventListener('keydown', (e) => {
+            // Track 'w' and 's' keys
+            keysPressed[e.key.toLowerCase()] = true;
+        });
+    
+        document.addEventListener('keyup', (e) => {
+            // Stop tracking when key is released
+            keysPressed[e.key.toLowerCase()] = false;
+        });
+    
+        // ----------------------------------
+    
+    
         function updateBall() {
             ballX += ballSpeedX;
             ballY += ballSpeedY;
-            
+    
             // Bounce off top and bottom walls
             if (ballY <= 0 || ballY >= gameHeight - ballSize) {
                 ballSpeedY = -ballSpeedY;
             }
-            
+    
             // Bounce off paddles
+            // Left Paddle Collision (USER)
             if (ballX <= 35 && ballY + ballSize >= paddleLeftY && ballY <= paddleLeftY + paddleHeight) {
                 ballSpeedX = -ballSpeedX;
-                // Add some randomness to make it more interesting
-                ballSpeedY += (Math.random() - 0.5) * 2;
+                ballSpeedY += (Math.random() - 0.5) * 1.5;
             }
-            
+    
+            // Right Paddle Collision (AI)
             if (ballX >= gameWidth - 35 - ballSize && ballY + ballSize >= paddleRightY && ballY <= paddleRightY + paddleHeight) {
                 ballSpeedX = -ballSpeedX;
-                ballSpeedY += (Math.random() - 0.5) * 2;
+                ballSpeedY += (Math.random() - 0.5) * 1.5;
             }
-            
-            // Reset ball if it goes off screen
+    
+            // Reset ball if it goes off screen (Scoring)
             if (ballX < 0) {
                 rightScore++;
                 scoreRight.textContent = rightScore;
-                resetBall();
+                resetBall(1); // Serve to the right (AI)
             }
             if (ballX > gameWidth) {
                 leftScore++;
                 scoreLeft.textContent = leftScore;
-                resetBall();
+                resetBall(-1); // Serve to the left (User)
             }
-            
+    
             ball.style.left = ballX + 'px';
             ball.style.top = ballY + 'px';
         }
-        
+    
         function updatePaddles() {
-            // Left paddle AI - follows the ball
-            if (paddleLeftY + paddleHeight/2 < ballY) {
-                paddleLeftY += paddleSpeed;
-            } else if (paddleLeftY + paddleHeight/2 > ballY) {
-                paddleLeftY -= paddleSpeed;
+            // --- Left Paddle Movement (USER CONTROL) ---
+            if (keysPressed['w']) {
+                paddleLeftY -= userPaddleSpeed;
             }
-            
-            // Right paddle AI - follows the ball
-            if (paddleRightY + paddleHeight/2 < ballY) {
-                paddleRightY += paddleSpeed;
-            } else if (paddleRightY + paddleHeight/2 > ballY) {
-                paddleRightY -= paddleSpeed;
+            if (keysPressed['s']) {
+                paddleLeftY += userPaddleSpeed;
+            }
+    
+            // --- Right Paddle Movement (AI CONTROL) ---
+            // AI follows the ball, but only reacts when the ball is heading toward it
+            if (ballSpeedX > 0) { // Ball is moving right
+                if (paddleRightY + paddleHeight / 2 < ballY) {
+                    paddleRightY += paddleSpeed;
+                } else if (paddleRightY + paddleHeight / 2 > ballY) {
+                    paddleRightY -= paddleSpeed;
+                }
             }
             
             // Keep paddles within bounds
             paddleLeftY = Math.max(0, Math.min(gameHeight - paddleHeight, paddleLeftY));
             paddleRightY = Math.max(0, Math.min(gameHeight - paddleHeight, paddleRightY));
-            
+    
+            // Apply new positions
             paddleLeft.style.top = paddleLeftY + 'px';
             paddleRight.style.top = paddleRightY + 'px';
         }
-        
-        function resetBall() {
+    
+        function resetBall(direction = 1) { // direction: 1 for right, -1 for left
             ballX = gameWidth / 2;
             ballY = gameHeight / 2;
-            ballSpeedX = (Math.random() > 0.5 ? 3 : -3);
+            ballSpeedX = direction * (Math.random() * 2 + 2);
             ballSpeedY = (Math.random() - 0.5) * 4;
         }
-        
+    
         function gameLoop() {
             updateBall();
             updatePaddles();
             requestAnimationFrame(gameLoop);
         }
-        
+    
         // Start the game
         gameLoop();
     </script>
