@@ -5,8 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hello from the vibeside</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    
     <style>
+        /* ======================================= */
+        /* === NEW CODE FOR GLITCH ANIMATION === */
+        /* ======================================= */
+        @keyframes glitch-disappear {
+            0% { transform: translate(0); opacity: 1; text-shadow: 0 0 5px #39FF14; }
+            10% { transform: translate(5px, 5px) skewX(20deg); color: #FF00FF; }
+            20% { transform: translate(-5px, -5px) skewX(-20deg); color: #00FFFF; }
+            30% { transform: translate(10px, 0); opacity: 0.9; text-shadow: 0 0 15px #FF00FF; }
+            100% { transform: translate(0, 100px); opacity: 0; }
+        }
+
+        .glitch-start {
+            animation: glitch-disappear 0.8s forwards;
+            pointer-events: none;
+        }
+        /* ======================================= */
+        /* ======================================= */
+
         body {
+            /* Full Retro Body Styles (Your original body code) */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
             margin: 0;
             font-family: 'VT323', 'Courier New', monospace;
             background-color: #677872;
@@ -15,23 +40,87 @@
                 linear-gradient(0deg, rgba(57, 255, 20, 0.1) 1px, transparent 1px);
             background-size: 50px 50px;
         }
+
         h1 {
             text-align: center;
             color: #39FF14;
             text-shadow: 0 0 10px #39FF14;
             font-family: 'Press Start 2P', 'Courier New', cursive;
             font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            z-index: 2001;
         }
+        
         p {
             text-align: center;
             max-width: 600px;
-            margin: 20px auto;
+            margin: 0 auto 30px;
             padding: 0 20px;
             line-height: 1.6;
             color: #00FFFF;
             font-family: 'VT323', 'Courier New', monospace;
             font-size: 20px;
+            z-index: 2001;
         }
+
+        /* Pong Game Styles */
+        .pong-game {
+            position: relative;
+            width: 600px;
+            height: 400px;
+            background-color: #000000;
+            border: 3px solid #39FF14;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+            overflow: hidden;
+            z-index: 2000;
+        }
+        
+        .pong-ball, .pong-paddle {
+            position: absolute;
+            background-color: #39FF14;
+            border-radius: 2px;
+            box-shadow: 0 0 8px #39FF14;
+        }
+
+        .pong-ball {
+            width: 20px;
+            height: 20px;
+            box-shadow: 0 0 10px #39FF14;
+        }
+        
+        .pong-paddle {
+            width: 15px;
+            height: 80px;
+        }
+        
+        .paddle-left {
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .paddle-right {
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .score {
+            position: absolute;
+            top: 20px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 16px;
+            color: #39FF14;
+            text-shadow: 0 0 5px #39FF14;
+            z-index: 10;
+        }
+        
+        .score-left { left: 150px; }
+        .score-right { right: 150px; }
+
+        /* Button & Skeleton Styles */
         button {
             position: relative;
             padding: 15px 40px;
@@ -56,11 +145,6 @@
             transform: translateY(1px);
             animation: shake 0.5s ease-in-out infinite;
         }
-        button:active {
-            transform: translateY(2px);
-            box-shadow: 0 0 10px rgba(57, 255, 20, 0.4), 
-                        inset 0 1px 0 rgba(57, 255, 20, 0.2);
-        }
         .skeleton {
             display: flex;
             width: 40px;
@@ -75,40 +159,26 @@
             animation: dance 1s ease-in-out infinite alternate;
             box-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
         }
-        .skeleton-left {
-            margin-right: 25px;
+        .skeleton-left { margin-right: 25px; }
+        .skeleton-right { margin-left: 25px; }
+        .button-container {
+            margin-top: 30px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
         }
-        .skeleton-right {
-            margin-left: 25px;
-        }
+        
         @keyframes dance {
             0% { transform: rotate(-5deg); }
             100% { transform: rotate(5deg); }
         }
-        
         @keyframes shake {
             0%, 100% { transform: translateY(1px) translateX(0); }
             25% { transform: translateY(1px) translateX(-2px); }
             75% { transform: translateY(1px) translateX(2px); }
         }
-        .button-container {
-            position: fixed;
-            bottom: 50px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: transparent;
-            padding: 20px;
-            border-radius: 0;
-            border: none;
-            box-shadow: none;
-            overflow: visible;
-            z-index: 2000;
-        }
-        
-        
+
         /* CRT Scanline Overlay */
         .crt-overlay {
             position: fixed;
@@ -144,91 +214,13 @@
             0% { transform: translateY(0); }
             100% { transform: translateY(2px); }
         }
-        
-        /* Pixel Icons */
-        .pixel-icon {
-            font-family: 'Press Start 2P', 'Courier New', cursive;
-            font-size: 12px;
-            color: #39FF14;
-            text-shadow: 0 0 5px #39FF14;
-        }
-        
-        /* Pong Game */
-        .pong-game {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 600px;
-            height: 400px;
-            background-color: #000000;
-            border: 3px solid #39FF14;
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
-            overflow: hidden;
-        }
-        
-        .pong-ball {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: #39FF14;
-            border-radius: 2px;
-            box-shadow: 0 0 10px #39FF14;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-        
-        .pong-paddle {
-            position: absolute;
-            width: 15px;
-            height: 80px;
-            background-color: #39FF14;
-            border-radius: 2px;
-            box-shadow: 0 0 8px #39FF14;
-        }
-        
-        .paddle-left {
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-        
-        .paddle-right {
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-        
-        .score {
-            position: absolute;
-            top: 20px;
-            font-family: 'Press Start 2P', 'Courier New', cursive;
-            font-size: 16px;
-            color: #39FF14;
-            text-shadow: 0 0 5px #39FF14;
-        }
-        
-        .score-left {
-            left: 50px;
-        }
-        
-        .score-right {
-            right: 50px;
-        }
     </style>
 </head>
 <body>
+    <audio id="paddle-sound" src="assets/blipsound.mp3" preload="auto"></audio>
     <h1>Hello from the vibeside</h1>
-    <p>Welcome to my first website! This site was built using AI and vibe coding.</p>
-    <div class="button-container">
-        <span class="skeleton skeleton-left">💀</span>
-        <button>DO NOT PRESS THIS BUTTON!</button>
-        <span class="skeleton skeleton-right">💀</span>
-    </div>
-    
-    <!-- Pong Game -->
+    <p>Welcome to my first website! Take in the vibe.</p>
+
     <div class="pong-game">
         <div class="score score-left">0</div>
         <div class="score score-right">0</div>
@@ -237,17 +229,31 @@
         <div class="pong-paddle paddle-right" id="paddleRight"></div>
     </div>
     
-    <!-- Retro Effects Overlays -->
+    <div class="button-container">
+        <span class="skeleton skeleton-left">💀</span>
+        <button id="startButton">DO NOT PRESS THIS BUTTON FOR SOUND!</button>
+        <span class="skeleton skeleton-right">💀</span>
+    </div>
+
     <div class="noise-overlay"></div>
     <div class="crt-overlay"></div>
     
     <script>
-        // Pong Game Logic
+        // Pong Game Logic 
         const ball = document.getElementById('ball');
         const paddleLeft = document.getElementById('paddleLeft');
         const paddleRight = document.getElementById('paddleRight');
         const scoreLeft = document.querySelector('.score-left');
         const scoreRight = document.querySelector('.score-right');
+        const paddleSound = document.getElementById('paddle-sound');
+    
+        /* ======================================= */
+        /* === NEW CODE: JS Variables === */
+        /* ======================================= */
+        const startButton = document.getElementById('startButton');
+        const skeletonLeft = document.querySelector('.skeleton-left');
+        const skeletonRight = document.querySelector('.skeleton-right');
+        /* ======================================= */
     
         let ballX = 300;
         let ballY = 200;
@@ -259,6 +265,13 @@
         let userPaddleSpeed = 5; // User paddle speed (for W/S keys)
         let leftScore = 0;
         let rightScore = 0;
+        
+        // NOTE: This function is still here, but it only runs *after* the game starts
+        function playPaddleHit() {
+    let sound = document.getElementById('paddle-sound');
+    sound.currentTime = 0; // Reset the sound to the beginning
+    sound.play();
+}
     
         const gameWidth = 600;
         const gameHeight = 400;
@@ -266,19 +279,15 @@
         const paddleHeight = 80;
     
         // --- W/S Keyboard Control Setup ---
-        // Object to track if W or S is currently pressed for smooth movement
         const keysPressed = {};
         
         document.addEventListener('keydown', (e) => {
-            // Track 'w' and 's' keys
             keysPressed[e.key.toLowerCase()] = true;
         });
     
         document.addEventListener('keyup', (e) => {
-            // Stop tracking when key is released
             keysPressed[e.key.toLowerCase()] = false;
         });
-    
         // ----------------------------------
     
     
@@ -291,29 +300,31 @@
                 ballSpeedY = -ballSpeedY;
             }
     
-            // Bounce off paddles
-            // Left Paddle Collision (USER)
+            // --- PADDLE COLLISION CHECKS (CLEAN AND WITH SOUND) ---
+            // Left Paddle
             if (ballX <= 35 && ballY + ballSize >= paddleLeftY && ballY <= paddleLeftY + paddleHeight) {
                 ballSpeedX = -ballSpeedX;
                 ballSpeedY += (Math.random() - 0.5) * 1.5;
+                playPaddleHit(); 
             }
-    
-            // Right Paddle Collision (AI)
+            
+            // Right Paddle (AI)
             if (ballX >= gameWidth - 35 - ballSize && ballY + ballSize >= paddleRightY && ballY <= paddleRightY + paddleHeight) {
                 ballSpeedX = -ballSpeedX;
                 ballSpeedY += (Math.random() - 0.5) * 1.5;
+                playPaddleHit(); 
             }
     
             // Reset ball if it goes off screen (Scoring)
             if (ballX < 0) {
                 rightScore++;
                 scoreRight.textContent = rightScore;
-                resetBall(1); // Serve to the right (AI)
+                resetBall(1); 
             }
             if (ballX > gameWidth) {
                 leftScore++;
                 scoreLeft.textContent = leftScore;
-                resetBall(-1); // Serve to the left (User)
+                resetBall(-1); 
             }
     
             ball.style.left = ballX + 'px';
@@ -330,8 +341,7 @@
             }
     
             // --- Right Paddle Movement (AI CONTROL) ---
-            // AI follows the ball, but only reacts when the ball is heading toward it
-            if (ballSpeedX > 0) { // Ball is moving right
+            if (ballSpeedX > 0) { 
                 if (paddleRightY + paddleHeight / 2 < ballY) {
                     paddleRightY += paddleSpeed;
                 } else if (paddleRightY + paddleHeight / 2 > ballY) {
@@ -348,7 +358,7 @@
             paddleRight.style.top = paddleRightY + 'px';
         }
     
-        function resetBall(direction = 1) { // direction: 1 for right, -1 for left
+        function resetBall(direction = 1) { 
             ballX = gameWidth / 2;
             ballY = gameHeight / 2;
             ballSpeedX = direction * (Math.random() * 2 + 2);
@@ -361,8 +371,47 @@
             requestAnimationFrame(gameLoop);
         }
     
-        // Start the game
-        gameLoop();
+        /* ======================================= */
+        /* === NEW CODE: Game Start Logic (MODIFIED TO BYPASS SOUND CHECK) === */
+        /* ======================================= */
+        
+        // 1. Function to handle the true game start (after animation)
+        function launchGame() {
+            startButton.style.display = 'none'; // Completely hide the button
+            skeletonLeft.style.display = 'none'; // Hide the skeletons
+            skeletonRight.style.display = 'none';
+            
+            // Start the main game loop
+            requestAnimationFrame(gameLoop);
+        }
+    
+        // 2. Function that runs when the button is first clicked
+        function handleButtonPress() {
+            // The sound check code has been removed here to bypass the file loading error.
+            
+            // Visually "break" the button and start the fun animation
+            startButton.textContent = "SOUND ACTIVATED. INITIATING GAME.";
+            startButton.classList.add('glitch-start');
+            
+            // Optional: Stop the skeleton dance animation
+            skeletonLeft.style.animation = 'none';
+            skeletonRight.style.animation = 'none';
+    
+            // Wait for the CSS animation (0.8s) to complete, then launch the game
+            setTimeout(launchGame, 800);
+            
+            // Prevent subsequent button actions
+            startButton.removeEventListener('click', handleButtonPress);
+        }
+    
+        // 3. Start the game by waiting for the button press
+        startButton.addEventListener('click', () => {
+    // Try to play the sound once to unlock audio
+    paddleSound.play().catch(() => {});
+    handleButtonPress();
+});
+
+        /* ======================================= */
     </script>
-</body>
-</html>
+    </body>
+    </html>
