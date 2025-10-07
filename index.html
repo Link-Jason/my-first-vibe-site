@@ -395,7 +395,36 @@ if (ballX >= gameWidth - 35 - ballSize && ballY + ballSize >= paddleRightY && ba
     // Keep the random vertical speed (you can change the 4 if you want to use a constant here too)
     ballSpeedY = (Math.random() - 0.5) * 4; 
 }
-    
+function checkGameOver() {
+    if (leftScore >= MAX_SCORE || rightScore >= MAX_SCORE) {
+        gameRunning = false; // Stops the game loop
+        
+        let winner = leftScore > rightScore ? "YOU" : "THE AI";
+        
+        // --- Game Over Message Display ---
+        const gameContainer = document.querySelector('.pong-game');
+        
+        // Remove existing scores
+        scoreLeft.style.display = 'none';
+        scoreRight.style.display = 'none';
+        
+        // Create and style the final message
+        const gameOverMessage = document.createElement('div');
+        gameOverMessage.textContent = `GAME OVER. ${winner} WINS!`;
+        gameOverMessage.style.position = 'absolute';
+        gameOverMessage.style.top = '50%';
+        gameOverMessage.style.left = '50%';
+        gameOverMessage.style.transform = 'translate(-50%, -50%)';
+        gameOverMessage.style.fontFamily = "'Press Start 2P', cursive";
+        gameOverMessage.style.fontSize = '20px';
+        gameOverMessage.style.color = '#FF00FF'; // Cyberpunk Magenta
+        gameOverMessage.style.textShadow = '0 0 10px #FF00FF, 0 0 20px rgba(255, 0, 255, 0.5)';
+        gameOverMessage.style.zIndex = '50';
+        
+        gameContainer.appendChild(gameOverMessage);
+    }
+}
+   
         function gameLoop() {
             updateBall();
             updatePaddles();
