@@ -310,8 +310,8 @@ let gameRunning = true; // <--- ADD THIS LINE (Flag to stop the game loop)
             ballX += ballSpeedX;
             ballY += ballSpeedY;
     
-            // Bounce off top and bottom walls
-            if (ballY <= 0 || ballY >= gameHeight - ballSize) {
+            if (ballY <= 0 || ball            // Bounce off top and bottom walls
+Y >= gameHeight - ballSize) {
                 ballSpeedY = -ballSpeedY;
             }
     
@@ -346,12 +346,14 @@ if (ballX >= gameWidth - 35 - ballSize && ballY + ballSize >= paddleRightY && ba
             if (ballX < 0) {
                 rightScore++;
                 scoreRight.textContent = rightScore;
-                resetBall(1); 
+                resetBall(1);
+                checkGameOver() 
             }
             if (ballX > gameWidth) {
                 leftScore++;
                 scoreLeft.textContent = leftScore;
                 resetBall(-1); 
+                checkGameOver()
             }
     
             ball.style.left = ballX + 'px';
@@ -424,12 +426,17 @@ function checkGameOver() {
         gameContainer.appendChild(gameOverMessage);
     }
 }
-   
-        function gameLoop() {
-            updateBall();
-            updatePaddles();
-            requestAnimationFrame(gameLoop);
-        }
+
+function gameLoop() {
+    // CRITICAL FIX: Only run game logic IF the game is still active
+    if (gameRunning) { 
+        updateBall();
+        updatePaddles();
+        // Request the next frame, continuing the loop
+        requestAnimationFrame(gameLoop);
+    } 
+    // If gameRunning is false, the loop stops here and doesn't call itself again!
+}
     
         /* ======================================= */
         /* === NEW CODE: Game Start Logic (MODIFIED TO BYPASS SOUND CHECK) === */
