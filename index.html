@@ -276,7 +276,14 @@ let gameRunning = true; // <--- ADD THIS LINE (Flag to stop the game loop)
         // NOTE: This function is still here, but it only runs *after* the game starts
         function playPaddleHit() {
     let sound = document.getElementById('paddle-sound');
-    sound.currentTime = 0; // Reset the sound to the beginning
+    
+    // 1. Explicitly pause the sound immediately
+    sound.pause(); 
+    
+    // 2. Reset the playhead to the very start
+    sound.currentTime = 0; 
+    
+    // 3. Play the sound instantly from the beginning
     sound.play();
 }
     
