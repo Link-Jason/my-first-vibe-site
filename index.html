@@ -317,26 +317,26 @@ let gameRunning = true; // <--- ADD THIS LINE (Flag to stop the game loop)
     
             // --- PADDLE COLLISION CHECKS (CLEAN AND WITH SOUND) ---
             // Left Paddle
+// Left Paddle
 if (ballX <= 35 && ballY + ballSize >= paddleLeftY && ballY <= paddleLeftY + paddleHeight) {
-    // FIX 1: Snaps the ball to the outside edge of the paddle (at X=35)
+    // FIX 1: Snaps the ball to the outside edge of the paddle (This is good)
     ballX = 35; 
     
-    // FIX 2: Ensures speed is positive before reversing, prevents getting stuck
-    ballSpeedX = Math.abs(ballSpeedX);
-    ballSpeedX = -ballSpeedX;
+    // FIX 2: SIMPLE REVERSAL for a clean bounce
+    ballSpeedX *= -1; 
     
     ballSpeedY += (Math.random() - 0.5) * 1.5;
     playPaddleHit(); 
 }
             
            // Right Paddle (AI)
+// Right Paddle (AI)
 if (ballX >= gameWidth - 35 - ballSize && ballY + ballSize >= paddleRightY && ballY <= paddleRightY + paddleHeight) {
-    // FIX 1: Snaps the ball to the left edge of the right paddle to prevent tunneling
+    // FIX 1: Snaps the ball to the left edge of the right paddle (This is good)
     ballX = gameWidth - 35 - ballSize; 
     
-    // FIX 2: Ensures speed is negative before reversing, preventing getting stuck
-    ballSpeedX = -Math.abs(ballSpeedX);
-    ballSpeedX = -ballSpeedX; 
+    // FIX 2: SIMPLE REVERSAL for a clean bounce
+    ballSpeedX *= -1; 
     
     ballSpeedY += (Math.random() - 0.5) * 1.5;
     playPaddleHit(); 
