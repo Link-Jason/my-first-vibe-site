@@ -443,14 +443,18 @@ function gameLoop() {
         /* ======================================= */
         
         // 1. Function to handle the true game start (after animation)
-        function launchGame() {
-            startButton.style.display = 'none'; // Completely hide the button
-            skeletonLeft.style.display = 'none'; // Hide the skeletons
-            skeletonRight.style.display = 'none';
-            
-            // Start the main game loop
-            requestAnimationFrame(gameLoop);
-        }
+function launchGame() {
+    // NOTE: gameRunning is already set to true at the top, 
+    // but we'll include it here for maximum safety, just in case.
+    gameRunning = true; 
+    
+    startButton.style.display = 'none'; // Completely hide the button
+    skeletonLeft.style.display = 'none'; // Hide the skeletons
+    skeletonRight.style.display = 'none';
+
+    // Start the main game loop
+    requestAnimationFrame(gameLoop);
+}
     
         // 2. Function that runs when the button is first clicked
         function handleButtonPress() {
