@@ -261,9 +261,9 @@
     
         let ballX = 300;
         let ballY = 200;
-        const BASE_BALL_SPEED = 4; // <--- NEW: The speed we want after every reset
-let ballSpeedX = BASE_BALL_SPEED; // Use the constant
-let ballSpeedY = 2; // Keep this as is for now
+        const BASE_BALL_SPEED = 4; // The speed we want after every reset
+        let ballSpeedX = BASE_BALL_SPEED; 
+        let ballSpeedY = 2; 
         let paddleLeftY = 160;
         let paddleRightY = 160;
         let paddleSpeed = 2.5; // AI speed for right paddle
@@ -271,22 +271,22 @@ let ballSpeedY = 2; // Keep this as is for now
         let leftScore = 0;
         let rightScore = 0;
 
-        const MAX_SCORE = 11; // <--- ADD THIS LINE (The Easter egg limit!)
-        let gameRunning = false; // The game is NOT running when the page loads
+        const MAX_SCORE = 11; 
+        let gameRunning = false; 
         
         // NOTE: This function is still here, but it only runs *after* the game starts
         function playPaddleHit() {
-    let sound = document.getElementById('paddle-sound');
-    
-    // 1. Explicitly pause the sound immediately
-    sound.pause(); 
-    
-    // 2. Reset the playhead to the very start
-    sound.currentTime = 0; 
-    
-    // 3. Play the sound instantly from the beginning
-    sound.play();
-}
+            let sound = document.getElementById('paddle-sound');
+            
+            // 1. Explicitly pause the sound immediately
+            sound.pause(); 
+            
+            // 2. Reset the playhead to the very start
+            sound.currentTime = 0; 
+            
+            // 3. Play the sound instantly from the beginning
+            sound.play();
+        }
     
         const gameWidth = 600;
         const gameHeight = 400;
@@ -305,42 +305,38 @@ let ballSpeedY = 2; // Keep this as is for now
         });
         // ----------------------------------
     
-    
         function updateBall() {
             ballX += ballSpeedX;
             ballY += ballSpeedY;
     
-            if (ballY <= 0 || ball            // Bounce off top and bottom walls
-Y >= gameHeight - ballSize) {
+            if (ballY <= 0 || ballY >= gameHeight - ballSize) {
                 ballSpeedY = -ballSpeedY;
             }
     
             // --- PADDLE COLLISION CHECKS (CLEAN AND WITH SOUND) ---
             // Left Paddle
-// Left Paddle
-if (ballX <= 35 && ballY + ballSize >= paddleLeftY && ballY <= paddleLeftY + paddleHeight) {
-    // FIX 1: Snaps the ball to the outside edge of the paddle (This is good)
-    ballX = 35; 
-    
-    // FIX 2: SIMPLE REVERSAL for a clean bounce
-    ballSpeedX *= -1; 
-    
-    ballSpeedY += (Math.random() - 0.5) * 1.5;
-    playPaddleHit(); 
-}
+            if (ballX <= 35 && ballY + ballSize >= paddleLeftY && ballY <= paddleLeftY + paddleHeight) {
+                // FIX 1: Snaps the ball to the outside edge of the paddle
+                ballX = 35; 
+                
+                // FIX 2: SIMPLE REVERSAL for a clean bounce
+                ballSpeedX *= -1; 
+                
+                ballSpeedY += (Math.random() - 0.5) * 1.5;
+                playPaddleHit(); 
+            }
             
-           // Right Paddle (AI)
-// Right Paddle (AI)
-if (ballX >= gameWidth - 35 - ballSize && ballY + ballSize >= paddleRightY && ballY <= paddleRightY + paddleHeight) {
-    // FIX 1: Snaps the ball to the left edge of the right paddle (This is good)
-    ballX = gameWidth - 35 - ballSize; 
-    
-    // FIX 2: SIMPLE REVERSAL for a clean bounce
-    ballSpeedX *= -1; 
-    
-    ballSpeedY += (Math.random() - 0.5) * 1.5;
-    playPaddleHit(); 
-}
+            // Right Paddle (AI)
+            if (ballX >= gameWidth - 35 - ballSize && ballY + ballSize >= paddleRightY && ballY <= paddleRightY + paddleHeight) {
+                // FIX 1: Snaps the ball to the left edge of the right paddle 
+                ballX = gameWidth - 35 - ballSize; 
+                
+                // FIX 2: SIMPLE REVERSAL for a clean bounce
+                ballSpeedX *= -1; 
+                
+                ballSpeedY += (Math.random() - 0.5) * 1.5;
+                playPaddleHit(); 
+            }
     
             // Reset ball if it goes off screen (Scoring)
             if (ballX < 0) {
@@ -366,7 +362,7 @@ if (ballX >= gameWidth - 35 - ballSize && ballY + ballSize >= paddleRightY && ba
                 paddleLeftY -= userPaddleSpeed;
             }
             if (keysPressed['s']) {
-                paddleLeftY += userPaddleSpeed;
+                paddleLeftY += userPaddlePaddleSpeed;
             }
     
             // --- Right Paddle Movement (AI CONTROL) ---
@@ -388,111 +384,103 @@ if (ballX >= gameWidth - 35 - ballSize && ballY + ballSize >= paddleRightY && ba
         }
     
         function resetBall(direction = 1) { 
-    ballX = gameWidth / 2;
-    ballY = gameHeight / 2;
-    
-    // FIX: Use the new constant to set the horizontal speed
-    ballSpeedX = direction * BASE_BALL_SPEED; 
-    
-    // Keep the random vertical speed (you can change the 4 if you want to use a constant here too)
-    ballSpeedY = (Math.random() - 0.5) * 4; 
-}
-function checkGameOver() {
-    if (leftScore >= MAX_SCORE || rightScore >= MAX_SCORE) {
-        gameRunning = false; // Stops the game loop
-        
-        let winner = leftScore > rightScore ? "YOU" : "THE AI";
-        
-        // --- Game Over Message Display ---
-        const gameContainer = document.querySelector('.pong-game');
-        
-        // Remove existing scores
-        scoreLeft.style.display = 'none';
-        scoreRight.style.display = 'none';
-        
-        // Create and style the final message
-        const gameOverMessage = document.createElement('div');
-        gameOverMessage.textContent = `GAME OVER. ${winner} WINS!`;
-        gameOverMessage.style.position = 'absolute';
-        gameOverMessage.style.top = '50%';
-        gameOverMessage.style.left = '50%';
-        gameOverMessage.style.transform = 'translate(-50%, -50%)';
-        gameOverMessage.style.fontFamily = "'Press Start 2P', cursive";
-        gameOverMessage.style.fontSize = '20px';
-        gameOverMessage.style.color = '#FF00FF'; // Cyberpunk Magenta
-        gameOverMessage.style.textShadow = '0 0 10px #FF00FF, 0 0 20px rgba(255, 0, 255, 0.5)';
-        gameOverMessage.style.zIndex = '50';
-        
-        gameContainer.appendChild(gameOverMessage);
-    }
-}
+            ballX = gameWidth / 2;
+            ballY = gameHeight / 2;
+            
+            // Use the new constant to set the horizontal speed
+            ballSpeedX = direction * BASE_BALL_SPEED; 
+            
+            // Keep the random vertical speed
+            ballSpeedY = (Math.random() - 0.5) * 4; 
+        }
 
-function gameLoop() {
-    // CRITICAL FIX: Only run game logic IF the game is still active
-    if (gameRunning) { 
-        updateBall();
-        updatePaddles();
-        // Request the next frame, continuing the loop
-        requestAnimationFrame(gameLoop);
-    } 
-    // If gameRunning is false, the loop stops here and doesn't call itself again!
-}
+        function checkGameOver() {
+            if (leftScore >= MAX_SCORE || rightScore >= MAX_SCORE) {
+                gameRunning = false; // Stops the game loop
+                
+                let winner = leftScore > rightScore ? "YOU" : "THE AI";
+                
+                // --- Game Over Message Display ---
+                const gameContainer = document.querySelector('.pong-game');
+                
+                // Remove existing scores
+                scoreLeft.style.display = 'none';
+                scoreRight.style.display = 'none';
+                
+                // Create and style the final message
+                const gameOverMessage = document.createElement('div');
+                gameOverMessage.textContent = `GAME OVER. ${winner} WINS!`;
+                gameOverMessage.style.position = 'absolute';
+                gameOverMessage.style.top = '50%';
+                gameOverMessage.style.left = '50%';
+                gameOverMessage.style.transform = 'translate(-50%, -50%)';
+                gameOverMessage.style.fontFamily = "'Press Start 2P', cursive";
+                gameOverMessage.style.fontSize = '20px';
+                gameOverMessage.style.color = '#FF00FF'; // Cyberpunk Magenta
+                gameOverMessage.style.textShadow = '0 0 10px #FF00FF, 0 0 20px rgba(255, 0, 255, 0.5)';
+                gameOverMessage.style.zIndex = '50';
+                
+                gameContainer.appendChild(gameOverMessage);
+            }
+        }
+
+        function gameLoop() {
+            // Only run game logic IF the game is still active
+            if (gameRunning) { 
+                updateBall();
+                updatePaddles();
+                // Request the next frame, continuing the loop
+                requestAnimationFrame(gameLoop);
+            } 
+            // If gameRunning is false, the loop stops here and doesn't call itself again!
+        }
     
         /* ======================================= */
-        /* === NEW CODE: Game Start Logic (MODIFIED TO BYPASS SOUND CHECK) === */
+        /* === FINAL FIXED GAME START LOGIC === */
         /* ======================================= */
         
-        // 1. Function to handle the true game start (after animation)
+        // 1. Function to handle the true game start
         function launchGame() {
-    // 1. Ensure the game state is active
-    gameRunning = true; 
-    
-    // 2. Set the initial positions of everything *before* the loop starts
-    resetBall(); // <--- CRITICAL NEW LINE
-    updatePaddles(); // <--- NEW LINE (Ensures paddles are centered before play)
-    
-    // 3. Hide the start elements
-    startButton.style.display = 'none';
-    skeletonLeft.style.display = 'none';
-    skeletonRight.style.display = 'none';
+            // 1. Ensure the game state is active
+            gameRunning = true; 
+            
+            // 2. Set the initial positions of everything *before* the loop starts
+            resetBall();     // Centers the ball and gives it initial speed
+            updatePaddles(); // Renders the paddles at their initial positions
+            
+            // 3. Hide the start elements
+            startButton.style.display = 'none';
+            skeletonLeft.style.display = 'none';
+            skeletonRight.style.display = 'none';
 
-    // 4. Start the main game loop
-    requestAnimationFrame(gameLoop);
-}
+            // 4. Start the main game loop
+            requestAnimationFrame(gameLoop);
+        }
     
-        // 2. Function that runs when the button is first clicked
-        function handleButtonPress() {
-            // The sound check code has been removed here to bypass the file loading error.
+        // 2. The single, working button listener
+        startButton.addEventListener('click', function startGameSequence() {
+            // 1. Attempt to play sound to unlock browser audio
+            let sound = document.getElementById('paddle-sound'); 
+            if (sound) {
+                sound.play().catch(e => {}); 
+            }
+
+            // 2. Animate and visually "break" the button
+            this.textContent = "SOUND ACTIVATED. INITIATING GAME."; 
+            this.classList.add('glitch-start');
             
-            // Visually "break" the button and start the fun animation
-            startButton.textContent = "SOUND ACTIVATED. INITIATING GAME.";
-            startButton.classList.add('glitch-start');
-            
-            // Optional: Stop the skeleton dance animation
+            // Stop the skeleton dance animation
             skeletonLeft.style.animation = 'none';
             skeletonRight.style.animation = 'none';
-    
-            // Wait for the CSS animation (0.8s) to complete, then launch the game
-            setTimeout(launchGame, 800);
-            
-            // Prevent subsequent button actions
-            startButton.removeEventListener('click', handleButtonPress);
-        }
-    // 3. Start the game by waiting for the button press
-startButton.addEventListener('click', () => {
-    // 1. Re-fetch the element inside the function for reliability
-    let sound = document.getElementById('paddle-sound'); 
-    
-    // 2. Attempt to play to unlock the browser's audio
-    if (sound) {
-        sound.play().catch(e => {}); 
-    }
 
-    // 3. Keep the original game launch function
-    handleButtonPress();
-});
+            // 3. Launch the game immediately
+            launchGame(); 
+            
+            // 4. CRITICAL: Remove the listener so it can only be clicked once
+            this.removeEventListener('click', startGameSequence);
+        });
 
         /* ======================================= */
     </script>
-    </body>
-    </html>
+</body>
+</html>
