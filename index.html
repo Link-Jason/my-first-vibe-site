@@ -219,7 +219,7 @@
 <body>
     <audio id="paddle-sound" src="assets/blipsound.mp3" preload="auto"></audio>
     <h1>Hello from the vibeside</h1>
-    <p>Welcome to my first website! Take in the vibe.</p>
+    <p>WARNING: FUN IS INITIATED BY DEFIANCE. IF YOU PRESS BELOW, USE 'W' AND 'S' KEYS.<br>BUT SERIOUSLY, DON'T PRESS THAT BUTTON!</p>
 
     <div class="pong-game">
         <div class="score score-left">0</div>
@@ -231,7 +231,7 @@
     
     <div class="button-container">
         <span class="skeleton skeleton-left">💀</span>
-        <button id="startButton">DO NOT PRESS THIS BUTTON FOR SOUND!</button>
+        <button id="startButton">DO NOT PRESS THIS BUTTON!</button>
         <span class="skeleton skeleton-right">💀</span>
     </div>
 
@@ -403,11 +403,17 @@
             // Prevent subsequent button actions
             startButton.removeEventListener('click', handleButtonPress);
         }
+    // 3. Start the game by waiting for the button press
+startButton.addEventListener('click', () => {
+    // 1. Re-fetch the element inside the function for reliability
+    let sound = document.getElementById('paddle-sound'); 
     
-        // 3. Start the game by waiting for the button press
-        startButton.addEventListener('click', () => {
-    // Try to play the sound once to unlock audio
-    paddleSound.play().catch(() => {});
+    // 2. Attempt to play to unlock the browser's audio
+    if (sound) {
+        sound.play().catch(e => {}); 
+    }
+
+    // 3. Keep the original game launch function
     handleButtonPress();
 });
 
