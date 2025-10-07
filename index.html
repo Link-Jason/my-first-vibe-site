@@ -265,6 +265,9 @@
         let userPaddleSpeed = 5; // User paddle speed (for W/S keys)
         let leftScore = 0;
         let rightScore = 0;
+
+        const MAX_SCORE = 11; // <--- ADD THIS LINE (The Easter egg limit!)
+let gameRunning = true; // <--- ADD THIS LINE (Flag to stop the game loop)
         
         // NOTE: This function is still here, but it only runs *after* the game starts
         function playPaddleHit() {
