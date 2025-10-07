@@ -443,16 +443,20 @@ function gameLoop() {
         /* ======================================= */
         
         // 1. Function to handle the true game start (after animation)
-function launchGame() {
-    // NOTE: gameRunning is already set to true at the top, 
-    // but we'll include it here for maximum safety, just in case.
+        function launchGame() {
+    // 1. Ensure the game state is active
     gameRunning = true; 
     
-    startButton.style.display = 'none'; // Completely hide the button
-    skeletonLeft.style.display = 'none'; // Hide the skeletons
+    // 2. Set the initial positions of everything *before* the loop starts
+    resetBall(); // <--- CRITICAL NEW LINE
+    updatePaddles(); // <--- NEW LINE (Ensures paddles are centered before play)
+    
+    // 3. Hide the start elements
+    startButton.style.display = 'none';
+    skeletonLeft.style.display = 'none';
     skeletonRight.style.display = 'none';
 
-    // Start the main game loop
+    // 4. Start the main game loop
     requestAnimationFrame(gameLoop);
 }
     
