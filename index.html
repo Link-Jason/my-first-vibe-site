@@ -261,8 +261,9 @@
     
         let ballX = 300;
         let ballY = 200;
-        let ballSpeedX = 4;
-        let ballSpeedY = 2;
+        const BASE_BALL_SPEED = 4; // <--- NEW: The speed we want after every reset
+let ballSpeedX = BASE_BALL_SPEED; // Use the constant
+let ballSpeedY = 2; // Keep this as is for now
         let paddleLeftY = 160;
         let paddleRightY = 160;
         let paddleSpeed = 2.5; // AI speed for right paddle
@@ -373,11 +374,15 @@ let gameRunning = true; // <--- ADD THIS LINE (Flag to stop the game loop)
         }
     
         function resetBall(direction = 1) { 
-            ballX = gameWidth / 2;
-            ballY = gameHeight / 2;
-            ballSpeedX = direction * (Math.random() * 2 + 2);
-            ballSpeedY = (Math.random() - 0.5) * 4;
-        }
+    ballX = gameWidth / 2;
+    ballY = gameHeight / 2;
+    
+    // FIX: Use the new constant to set the horizontal speed
+    ballSpeedX = direction * BASE_BALL_SPEED; 
+    
+    // Keep the random vertical speed (you can change the 4 if you want to use a constant here too)
+    ballSpeedY = (Math.random() - 0.5) * 4; 
+}
     
         function gameLoop() {
             updateBall();
