@@ -272,7 +272,7 @@ let ballSpeedY = 2; // Keep this as is for now
         let rightScore = 0;
 
         const MAX_SCORE = 11; // <--- ADD THIS LINE (The Easter egg limit!)
-let gameRunning = true; // <--- ADD THIS LINE (Flag to stop the game loop)
+        let gameRunning = false; // The game is NOT running when the page loads
         
         // NOTE: This function is still here, but it only runs *after* the game starts
         function playPaddleHit() {
