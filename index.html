@@ -37,14 +37,14 @@
             animation: screen-shake 0.3s ease-out;
         }
 
-        /* NEW: IMPACT FLASH (on hit) */
+        /* IMPACT FLASH (on hit) */
         .pong-ball.flash, .pong-paddle.flash {
             background-color: #FF00FF; /* Cyberpunk Magenta */
             box-shadow: 0 0 15px #FF00FF, 0 0 30px rgba(255, 0, 255, 0.7);
             transition: background-color 0.1s, box-shadow 0.1s;
         }
 
-        /* NEW: GLITCH EFFECT (on score) */
+        /* GLITCH EFFECT (on score) */
         @keyframes glitch-filter {
             0% { filter: hue-rotate(0deg) blur(0); }
             10% { filter: hue-rotate(90deg) blur(1px); }
@@ -261,7 +261,7 @@
         <br>BUT SERIOUSLY, DON'T PRESS THAT BUTTON!
     </p>
 
-    <div class="pong-game">
+    <div class="pong-game" id="gameContainer">
         <div class="score score-left">0</div>
         <div class="score score-right">0</div>
         <div class="pong-ball" id="ball"></div>
@@ -285,47 +285,48 @@
         const paddleRight = document.getElementById('paddleRight');
         const scoreLeft = document.querySelector('.score-left');
         const scoreRight = document.querySelector('.score-right');
+        const gameContainer = document.getElementById('gameContainer'); // Added ID to use in JS
         
-        // --- NEW CODE: JS Variables ---
+        // --- Game Setup Elements ---
         const startButton = document.getElementById('startButton');
         const skeletonLeft = document.querySelector('.skeleton-left');
         const skeletonRight = document.querySelector('.skeleton-right');
         
         let ballX = 300;
         let ballY = 200;
-        const BASE_BALL_SPEED = 4; // The speed we want after every reset
+        const BASE_BALL_SPEED = 4;
         let ballSpeedX = BASE_BALL_SPEED; 
         let ballSpeedY = 2; 
         let paddleLeftY = 160;
         let paddleRightY = 160;
         
-        // 🛑 NEW CODE: BALL SPEED RAMP-UP VARIABLES 🛑
-        let ballSpeedCap = 12; // Maximum speed the ball can travel
-        const BALL_SPEED_INCREMENT_ON_HIT = 0.2; // How much the ball speeds up per paddle hit
+        // 🛑 CORE GAMEPLAY VARIABLES 🛑
+        let ballSpeedCap = 12; // Maximum ball speed
+        const BALL_SPEED_INCREMENT_ON_HIT = 0.2; // Ball speed up per hit
+        let paddleSpeed = 2.0; // Starting AI speed
+        const AI_SPEED_INCREMENT = 0.2; // AI speed up per score
         
-        // 🛑 NEW CODE: DYNAMIC AI SPEED VARIABLES 🛑
-        let paddleSpeed = 2.0; // Starting AI speed (a bit slower for scaling)
-        const AI_SPEED_INCREMENT = 0.2; // How much the AI speeds up per point
-        
-        let userPaddleSpeed = 5; // User paddle speed (for W/S keys)
+        let userPaddleSpeed = 5; 
         let leftScore = 0;
         let rightScore = 0;
 
-        const MAX_SCORE = 11; 
+        const MAX_SCORE = 5; // Changed back to 5 for faster testing/restarting 
         let gameRunning = false; 
         
-        
-        // 🛑 NEW CODE: playPaddleHit function with Flash and Pitch Randomization 🛑
+        const gameWidth = 600;
+        const gameHeight = 400;
+        const ballSize = 20;
+        const paddleHeight = 80;
+
+
+        // 🛑 playPaddleHit function with Flash and Pitch Randomization 🛑
         function playPaddleHit(paddleElement) {
             let sound = document.getElementById('paddle-sound');
             
-            // 1. Audio: Reset and play
+            // 1. Audio: Reset and play with randomized pitch
             sound.pause(); 
             sound.currentTime = 0; 
-            
-            // Randomize Pitch
-            sound.playbackRate = 1 + (Math.random() * 0.5 - 0.25); // Pitch varies between 0.75x and 1.25x
-            
+            sound.playbackRate = 1 + (Math.random() * 0.5 - 0.25); 
             sound.play();
 
             // 2. Visual: Flash the paddle and ball
@@ -336,13 +337,8 @@
             setTimeout(() => {
                 ball.classList.remove('flash');
                 paddleElement.classList.remove('flash');
-            }, 100); // Flash for 100ms
+            }, 100); 
         }
-    
-        const gameWidth = 600;
-        const gameHeight = 400;
-        const ballSize = 20;
-        const paddleHeight = 80;
     
         // --- W/S Keyboard Control Setup ---
         const keysPressed = {};
@@ -360,6 +356,7 @@
             ballX += ballSpeedX;
             ballY += ballSpeedY;
     
+            // Wall collision (top/bottom)
             if (ballY <= 0 || ballY >= gameHeight - ballSize) {
                 ballSpeedY = -ballSpeedY;
             }
@@ -370,17 +367,16 @@
                 // FIX 1: Snaps the ball to the outside edge of the paddle
                 ballX = 35; 
                 
-                // 🛑 UPDATED LOGIC: Reversal and Speed Increase (Ball Ramp-Up) 🛑
+                // UPDATED LOGIC: Reversal and Speed Increase (Ball Ramp-Up)
                 ballSpeedX *= -1;
-                // Increase speed, but don't exceed the cap
                 if (Math.abs(ballSpeedX) < ballSpeedCap) {
                     ballSpeedX += Math.sign(ballSpeedX) * BALL_SPEED_INCREMENT_ON_HIT;
                 }
                 
-                // 3. Randomize vertical speed slightly
+                // Randomize vertical speed slightly
                 ballSpeedY += (Math.random() - 0.5) * 1.5;
 
-                // 4. Play sound/flash effect
+                // Play sound/flash effect
                 playPaddleHit(paddleLeft); 
             }
             
@@ -389,17 +385,16 @@
                 // FIX 1: Snaps the ball to the left edge of the right paddle 
                 ballX = gameWidth - 35 - ballSize; 
                 
-                // 🛑 UPDATED LOGIC: Reversal and Speed Increase (Ball Ramp-Up) 🛑
+                // UPDATED LOGIC: Reversal and Speed Increase (Ball Ramp-Up)
                 ballSpeedX *= -1; 
-                // Increase speed, but don't exceed the cap
                 if (Math.abs(ballSpeedX) < ballSpeedCap) {
                     ballSpeedX += Math.sign(ballSpeedX) * BALL_SPEED_INCREMENT_ON_HIT;
                 }
                 
-                // 3. Randomize vertical speed slightly
+                // Randomize vertical speed slightly
                 ballSpeedY += (Math.random() - 0.5) * 1.5;
 
-                // 4. Play sound/flash effect
+                // Play sound/flash effect
                 playPaddleHit(paddleRight); 
             }
     
@@ -408,7 +403,7 @@
                 rightScore++;
                 scoreRight.textContent = rightScore;
                 
-                // 🛑 NEW CODE: Increase AI difficulty (Dynamic AI) 🛑
+                // NEW CODE: Increase AI difficulty (Dynamic AI)
                 if (rightScore < MAX_SCORE) {
                     paddleSpeed += AI_SPEED_INCREMENT;
                 }
@@ -420,7 +415,7 @@
                 leftScore++;
                 scoreLeft.textContent = leftScore;
                 
-                // 🛑 NEW CODE: Increase AI difficulty (Dynamic AI) 🛑
+                // NEW CODE: Increase AI difficulty (Dynamic AI)
                 if (leftScore < MAX_SCORE) {
                     paddleSpeed += AI_SPEED_INCREMENT;
                 }
@@ -443,7 +438,6 @@
             }
     
             // --- Right Paddle Movement (AI CONTROL) ---
-            // The AI only tracks the ball when it's moving towards it (ballSpeedX > 0)
             if (ballSpeedX > 0) { 
                 if (paddleRightY + paddleHeight / 2 < ballY) {
                     paddleRightY += paddleSpeed; // Uses the dynamic paddleSpeed
@@ -466,8 +460,6 @@
             ballX = gameWidth / 2;
             ballY = gameHeight / 2;
             
-            const gameContainer = document.querySelector('.pong-game');
-            
             // Add Glitch Filter Class
             gameContainer.classList.add('glitch-screen');
 
@@ -487,33 +479,84 @@
             ballSpeedY = (Math.random() - 0.5) * 4; 
         }
 
+        // 🛑 UPDATED checkGameOver function with Play Again button 🛑
         function checkGameOver() {
             if (leftScore >= MAX_SCORE || rightScore >= MAX_SCORE) {
                 gameRunning = false; // Stops the game loop
                 
-                let winner = leftScore > rightScore ? "YOU" : "THE AI";
-                
-                // --- Game Over Message Display ---
-                const gameContainer = document.querySelector('.pong-game');
-                
-                // Remove existing scores
+                // Hide scores
                 scoreLeft.style.display = 'none';
                 scoreRight.style.display = 'none';
                 
-                // Create and style the final message
+                const winner = leftScore > rightScore ? "YOU" : "THE AI";
+                
+                // 1. Create Game Over Message
                 const gameOverMessage = document.createElement('div');
                 gameOverMessage.textContent = `GAME OVER. ${winner} WINS!`;
-                gameOverMessage.style.position = 'absolute';
-                gameOverMessage.style.top = '50%';
-                gameOverMessage.style.left = '50%';
-                gameOverMessage.style.transform = 'translate(-50%, -50%)';
-                gameOverMessage.style.fontFamily = "'Press Start 2P', cursive";
-                gameOverMessage.style.fontSize = '20px';
-                gameOverMessage.style.color = '#FF00FF'; // Cyberpunk Magenta
-                gameOverMessage.style.textShadow = '0 0 10px #FF00FF, 0 0 20px rgba(255, 0, 255, 0.5)';
-                gameOverMessage.style.zIndex = '50';
                 
+                // Style the message
+                Object.assign(gameOverMessage.style, {
+                    position: 'absolute',
+                    top: '40%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    fontFamily: "'Press Start 2P', cursive",
+                    fontSize: '20px',
+                    color: '#FF00FF', 
+                    textShadow: '0 0 10px #FF00FF, 0 0 20px rgba(255, 0, 255, 0.5)',
+                    zIndex: '50'
+                });
+                
+                // 2. Create Play Again Button
+                const playAgainButton = document.createElement('button');
+                playAgainButton.textContent = "PLAY AGAIN?";
+                
+                // Style the button
+                Object.assign(playAgainButton.style, {
+                    position: 'absolute',
+                    top: '60%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    // Inherit main button styles if possible, but keep it on top
+                    zIndex: '50', 
+                    // Add some margin for visual separation
+                    marginTop: '20px',
+                    padding: '10px 20px',
+                    // Apply the cyber-retro look again
+                    background: 'linear-gradient(to bottom, #000000, #1a1a1a)',
+                    color: '#39FF14',
+                    border: '2px solid #39FF14',
+                    borderRadius: '8px',
+                    boxShadow: '0 0 15px rgba(57, 255, 20, 0.4)'
+                });
+                
+                // 3. Add Restart Logic
+                playAgainButton.addEventListener('click', () => {
+                    // Reset scores and display
+                    leftScore = 0;
+                    rightScore = 0;
+                    scoreLeft.textContent = '0';
+                    scoreRight.textContent = '0';
+                    scoreLeft.style.display = 'block';
+                    scoreRight.style.display = 'block';
+
+                    // Reset paddle positions and AI speed
+                    paddleLeftY = 160;
+                    paddleRightY = 160;
+                    paddleSpeed = 2.0;
+                    
+                    // Remove game over elements
+                    gameOverMessage.remove();
+                    playAgainButton.remove();
+
+                    // Restart the game loop
+                    resetBall();
+                    gameRunning = true;
+                    requestAnimationFrame(gameLoop);
+                });
+
                 gameContainer.appendChild(gameOverMessage);
+                gameContainer.appendChild(playAgainButton);
             }
         }
 
@@ -533,42 +576,32 @@
         
         // 1. Function to handle the true game start
         function launchGame() {
-            // 1. Ensure the game state is active
             gameRunning = true; 
+            resetBall(); 
+            updatePaddles(); 
             
-            // 2. Set the initial positions of everything *before* the loop starts
-            resetBall();     // Centers the ball and gives it initial speed
-            updatePaddles(); // Renders the paddles at their initial positions
-            
-            // 3. Hide the start elements
             startButton.style.display = 'none';
             skeletonLeft.style.display = 'none';
             skeletonRight.style.display = 'none';
 
-            // 4. Start the main game loop
             requestAnimationFrame(gameLoop);
         }
     
         // 2. The single, working button listener
         startButton.addEventListener('click', function startGameSequence() {
-            // 1. Attempt to play sound to unlock browser audio
             let sound = document.getElementById('paddle-sound'); 
             if (sound) {
                 sound.play().catch(e => {}); 
             }
 
-            // 2. Animate and visually "break" the button
             this.textContent = "SOUND ACTIVATED. INITIATING GAME."; 
             this.classList.add('glitch-start');
             
-            // Stop the skeleton dance animation
             skeletonLeft.style.animation = 'none';
             skeletonRight.style.animation = 'none';
 
-            // 3. Launch the game immediately
             launchGame(); 
             
-            // 4. CRITICAL: Remove the listener so it can only be clicked once
             this.removeEventListener('click', startGameSequence);
         });
 
