@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello from the vibeside</title>
+    <title>WOULD YOU LIKE TO PLAY A GAME?</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     
     <style>
@@ -22,7 +23,8 @@
             animation: glitch-disappear 0.8s forwards;
             pointer-events: none;
         }
-
+        
+        /* SCREEN SHAKE (on score) */
         @keyframes screen-shake {
             0%, 100% { transform: translate(0, 0); }
             20% { transform: translate(-1px, -1px); }
@@ -35,12 +37,29 @@
             animation: screen-shake 0.3s ease-out;
         }
 
-        /* NEW: Impact Flash for Ball/Paddles */
+        /* NEW: IMPACT FLASH (on hit) */
         .pong-ball.flash, .pong-paddle.flash {
             background-color: #FF00FF; /* Cyberpunk Magenta */
             box-shadow: 0 0 15px #FF00FF, 0 0 30px rgba(255, 0, 255, 0.7);
             transition: background-color 0.1s, box-shadow 0.1s;
         }
+
+        /* NEW: GLITCH EFFECT (on score) */
+        @keyframes glitch-filter {
+            0% { filter: hue-rotate(0deg) blur(0); }
+            10% { filter: hue-rotate(90deg) blur(1px); }
+            20% { filter: hue-rotate(0deg) blur(0); }
+            30% { filter: hue-rotate(180deg) blur(2px); }
+            40% { filter: hue-rotate(0deg) blur(0); }
+            50% { filter: hue-rotate(270deg) blur(1px); }
+            60% { filter: hue-rotate(0deg) blur(0); }
+            100% { filter: hue-rotate(0deg) blur(0); }
+        }
+
+        .glitch-screen {
+            animation: glitch-filter 0.5s ease-out;
+        }
+
         /* ======================================= */
 
         body {
@@ -235,7 +254,7 @@
 </head>
 <body>
     <audio id="paddle-sound" src="assets/blipsound.mp3" preload="auto"></audio>
-    <h1>Hello from the vibeside</h1>
+    <h1>WOULD YOU LIKE TO PLAY A GAME?</h1>
     <p>
         WARNING: FUN IS INITIATED BY DEFIANCE.<br> 
         IF YOU PRESS BELOW, USE 'W' AND 'S' KEYS.
@@ -389,7 +408,7 @@
                 rightScore++;
                 scoreRight.textContent = rightScore;
                 
-                // 🛑 NEW CODE: Increase AI difficulty 🛑
+                // 🛑 NEW CODE: Increase AI difficulty (Dynamic AI) 🛑
                 if (rightScore < MAX_SCORE) {
                     paddleSpeed += AI_SPEED_INCREMENT;
                 }
@@ -401,7 +420,7 @@
                 leftScore++;
                 scoreLeft.textContent = leftScore;
                 
-                // 🛑 NEW CODE: Increase AI difficulty 🛑
+                // 🛑 NEW CODE: Increase AI difficulty (Dynamic AI) 🛑
                 if (leftScore < MAX_SCORE) {
                     paddleSpeed += AI_SPEED_INCREMENT;
                 }
@@ -424,11 +443,12 @@
             }
     
             // --- Right Paddle Movement (AI CONTROL) ---
+            // The AI only tracks the ball when it's moving towards it (ballSpeedX > 0)
             if (ballSpeedX > 0) { 
                 if (paddleRightY + paddleHeight / 2 < ballY) {
-                    paddleRightY += paddleSpeed;
+                    paddleRightY += paddleSpeed; // Uses the dynamic paddleSpeed
                 } else if (paddleRightY + paddleHeight / 2 > ballY) {
-                    paddleRightY -= paddleSpeed;
+                    paddleRightY -= paddleSpeed; // Uses the dynamic paddleSpeed
                 }
             }
             
@@ -441,17 +461,24 @@
             paddleRight.style.top = paddleRightY + 'px';
         }
     
-        // 🛑 UPDATED resetBall function with Screen Shake 🛑
+        // 🛑 UPDATED resetBall function with Screen Shake AND Glitch Effect 🛑
         function resetBall(direction = 1) { 
             ballX = gameWidth / 2;
             ballY = gameHeight / 2;
             
             const gameContainer = document.querySelector('.pong-game');
+            
+            // Add Glitch Filter Class
+            gameContainer.classList.add('glitch-screen');
+
+            // Add screen shake class
             gameContainer.classList.add('shake-it');
 
             setTimeout(() => {
+                // Remove both classes after the animation duration (0.5s for glitch)
                 gameContainer.classList.remove('shake-it');
-            }, 300);
+                gameContainer.classList.remove('glitch-screen');
+            }, 500); // Timeout increased to 500ms for a full, dramatic effect
             
             // Use the new constant to set the horizontal speed
             ballSpeedX = direction * BASE_BALL_SPEED; 
@@ -498,7 +525,6 @@
                 // Request the next frame, continuing the loop
                 requestAnimationFrame(gameLoop);
             } 
-            // If gameRunning is false, the loop stops here and doesn't call itself again!
         }
     
         /* ======================================= */
