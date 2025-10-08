@@ -106,7 +106,6 @@
   }
 
         
-        
         .score {
             position: absolute;
             top: 20px;
@@ -178,7 +177,17 @@
             25% { transform: translateY(1px) translateX(-2px); }
             75% { transform: translateY(1px) translateX(2px); }
         }
+        @keyframes screen-shake {
+            0%, 100% { transform: translate(0, 0); }
+            20% { transform: translate(-1px, -1px); }
+            40% { transform: translate(1px, 1px); }
+            60% { transform: translate(-1px, 1px); }
+            80% { transform: translate(1px, -1px); }
+        }
 
+        .shake-it {
+            animation: screen-shake 0.3s ease-out;
+        }
         /* CRT Scanline Overlay */
         .crt-overlay {
             position: fixed;
@@ -386,6 +395,13 @@
         function resetBall(direction = 1) { 
             ballX = gameWidth / 2;
             ballY = gameHeight / 2;
+
+            const gameContainer = document.querySelector('.pong-game');
+    gameContainer.classList.add('shake-it');
+
+    setTimeout(() => {
+        gameContainer.classList.remove('shake-it');
+    }, 300);
             
             // Use the new constant to set the horizontal speed
             ballSpeedX = direction * BASE_BALL_SPEED; 
