@@ -488,11 +488,12 @@
                 scoreLeft.style.display = 'none';
                 scoreRight.style.display = 'none';
                 
-                const winner = leftScore > rightScore ? "YOU" : "THE AI";
+                let winner = leftScore > rightScore ? "YOU" : "THE AI";
+                let verb = leftScore > rightScore ? "WIN" : "WINS";
                 
                 // 1. Create Game Over Message
                 const gameOverMessage = document.createElement('div');
-                gameOverMessage.textContent = `GAME OVER. ${winner} WINS!`;
+                gameOverMessage.textContent = `GAME OVER. ${winner} ${verb}!`;
                 
                 // Style the message
                 Object.assign(gameOverMessage.style, {
