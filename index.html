@@ -8,7 +8,7 @@
     
     <style>
         /* ======================================= */
-        /* === NEW CODE FOR GLITCH ANIMATION === */
+        /* === ANIMATION & UTILITY CLASSES === */
         /* ======================================= */
         @keyframes glitch-disappear {
             0% { transform: translate(0); opacity: 1; text-shadow: 0 0 5px #39FF14; }
@@ -22,7 +22,25 @@
             animation: glitch-disappear 0.8s forwards;
             pointer-events: none;
         }
-        /* ======================================= */
+
+        @keyframes screen-shake {
+            0%, 100% { transform: translate(0, 0); }
+            20% { transform: translate(-1px, -1px); }
+            40% { transform: translate(1px, 1px); }
+            60% { transform: translate(-1px, 1px); }
+            80% { transform: translate(1px, -1px); }
+        }
+
+        .shake-it {
+            animation: screen-shake 0.3s ease-out;
+        }
+
+        /* NEW: Impact Flash for Ball/Paddles */
+        .pong-ball.flash, .pong-paddle.flash {
+            background-color: #FF00FF; /* Cyberpunk Magenta */
+            box-shadow: 0 0 15px #FF00FF, 0 0 30px rgba(255, 0, 255, 0.7);
+            transition: background-color 0.1s, box-shadow 0.1s;
+        }
         /* ======================================= */
 
         body {
@@ -96,14 +114,14 @@
         }
         
         .paddle-left {
-      left: 20px;
-      top: 160px; /* fixed centered position */
-  }
+            left: 20px;
+            top: 160px; /* fixed centered position */
+        }
 
-  .paddle-right {
-      right: 20px;
-      top: 160px; /* fixed centered position */
-  }
+        .paddle-right {
+            right: 20px;
+            top: 160px; /* fixed centered position */
+        }
 
         
         .score {
@@ -177,17 +195,7 @@
             25% { transform: translateY(1px) translateX(-2px); }
             75% { transform: translateY(1px) translateX(2px); }
         }
-        @keyframes screen-shake {
-            0%, 100% { transform: translate(0, 0); }
-            20% { transform: translate(-1px, -1px); }
-            40% { transform: translate(1px, 1px); }
-            60% { transform: translate(-1px, 1px); }
-            80% { transform: translate(1px, -1px); }
-        }
 
-        .shake-it {
-            animation: screen-shake 0.3s ease-out;
-        }
         /* CRT Scanline Overlay */
         .crt-overlay {
             position: fixed;
@@ -258,16 +266,12 @@
         const paddleRight = document.getElementById('paddleRight');
         const scoreLeft = document.querySelector('.score-left');
         const scoreRight = document.querySelector('.score-right');
-        const paddleSound = document.getElementById('paddle-sound');
-    
-        /* ======================================= */
-        /* === NEW CODE: JS Variables === */
-        /* ======================================= */
+        
+        // --- NEW CODE: JS Variables ---
         const startButton = document.getElementById('startButton');
         const skeletonLeft = document.querySelector('.skeleton-left');
         const skeletonRight = document.querySelector('.skeleton-right');
-        /* ======================================= */
-    
+        
         let ballX = 300;
         let ballY = 200;
         const BASE_BALL_SPEED = 4; // The speed we want after every reset
@@ -275,7 +279,15 @@
         let ballSpeedY = 2; 
         let paddleLeftY = 160;
         let paddleRightY = 160;
-        let paddleSpeed = 2.5; // AI speed for right paddle
+        
+        // 🛑 NEW CODE: BALL SPEED RAMP-UP VARIABLES 🛑
+        let ballSpeedCap = 12; // Maximum speed the ball can travel
+        const BALL_SPEED_INCREMENT_ON_HIT = 0.2; // How much the ball speeds up per paddle hit
+        
+        // 🛑 NEW CODE: DYNAMIC AI SPEED VARIABLES 🛑
+        let paddleSpeed = 2.0; // Starting AI speed (a bit slower for scaling)
+        const AI_SPEED_INCREMENT = 0.2; // How much the AI speeds up per point
+        
         let userPaddleSpeed = 5; // User paddle speed (for W/S keys)
         let leftScore = 0;
         let rightScore = 0;
@@ -283,18 +295,29 @@
         const MAX_SCORE = 11; 
         let gameRunning = false; 
         
-        // NOTE: This function is still here, but it only runs *after* the game starts
-        function playPaddleHit() {
+        
+        // 🛑 NEW CODE: playPaddleHit function with Flash and Pitch Randomization 🛑
+        function playPaddleHit(paddleElement) {
             let sound = document.getElementById('paddle-sound');
             
-            // 1. Explicitly pause the sound immediately
+            // 1. Audio: Reset and play
             sound.pause(); 
-            
-            // 2. Reset the playhead to the very start
             sound.currentTime = 0; 
             
-            // 3. Play the sound instantly from the beginning
+            // Randomize Pitch
+            sound.playbackRate = 1 + (Math.random() * 0.5 - 0.25); // Pitch varies between 0.75x and 1.25x
+            
             sound.play();
+
+            // 2. Visual: Flash the paddle and ball
+            ball.classList.add('flash');
+            paddleElement.classList.add('flash');
+            
+            // Remove the flash class after a short delay
+            setTimeout(() => {
+                ball.classList.remove('flash');
+                paddleElement.classList.remove('flash');
+            }, 100); // Flash for 100ms
         }
     
         const gameWidth = 600;
@@ -322,17 +345,24 @@
                 ballSpeedY = -ballSpeedY;
             }
     
-            // --- PADDLE COLLISION CHECKS (CLEAN AND WITH SOUND) ---
+            // --- PADDLE COLLISION CHECKS ---
             // Left Paddle
             if (ballX <= 35 && ballY + ballSize >= paddleLeftY && ballY <= paddleLeftY + paddleHeight) {
                 // FIX 1: Snaps the ball to the outside edge of the paddle
                 ballX = 35; 
                 
-                // FIX 2: SIMPLE REVERSAL for a clean bounce
-                ballSpeedX *= -1; 
+                // 🛑 UPDATED LOGIC: Reversal and Speed Increase (Ball Ramp-Up) 🛑
+                ballSpeedX *= -1;
+                // Increase speed, but don't exceed the cap
+                if (Math.abs(ballSpeedX) < ballSpeedCap) {
+                    ballSpeedX += Math.sign(ballSpeedX) * BALL_SPEED_INCREMENT_ON_HIT;
+                }
                 
+                // 3. Randomize vertical speed slightly
                 ballSpeedY += (Math.random() - 0.5) * 1.5;
-                playPaddleHit(); 
+
+                // 4. Play sound/flash effect
+                playPaddleHit(paddleLeft); 
             }
             
             // Right Paddle (AI)
@@ -340,23 +370,42 @@
                 // FIX 1: Snaps the ball to the left edge of the right paddle 
                 ballX = gameWidth - 35 - ballSize; 
                 
-                // FIX 2: SIMPLE REVERSAL for a clean bounce
+                // 🛑 UPDATED LOGIC: Reversal and Speed Increase (Ball Ramp-Up) 🛑
                 ballSpeedX *= -1; 
+                // Increase speed, but don't exceed the cap
+                if (Math.abs(ballSpeedX) < ballSpeedCap) {
+                    ballSpeedX += Math.sign(ballSpeedX) * BALL_SPEED_INCREMENT_ON_HIT;
+                }
                 
+                // 3. Randomize vertical speed slightly
                 ballSpeedY += (Math.random() - 0.5) * 1.5;
-                playPaddleHit(); 
+
+                // 4. Play sound/flash effect
+                playPaddleHit(paddleRight); 
             }
     
             // Reset ball if it goes off screen (Scoring)
             if (ballX < 0) {
                 rightScore++;
                 scoreRight.textContent = rightScore;
+                
+                // 🛑 NEW CODE: Increase AI difficulty 🛑
+                if (rightScore < MAX_SCORE) {
+                    paddleSpeed += AI_SPEED_INCREMENT;
+                }
+                
                 resetBall(1);
                 checkGameOver() 
             }
             if (ballX > gameWidth) {
                 leftScore++;
                 scoreLeft.textContent = leftScore;
+                
+                // 🛑 NEW CODE: Increase AI difficulty 🛑
+                if (leftScore < MAX_SCORE) {
+                    paddleSpeed += AI_SPEED_INCREMENT;
+                }
+
                 resetBall(-1); 
                 checkGameOver()
             }
@@ -392,16 +441,17 @@
             paddleRight.style.top = paddleRightY + 'px';
         }
     
+        // 🛑 UPDATED resetBall function with Screen Shake 🛑
         function resetBall(direction = 1) { 
             ballX = gameWidth / 2;
             ballY = gameHeight / 2;
-
+            
             const gameContainer = document.querySelector('.pong-game');
-    gameContainer.classList.add('shake-it');
+            gameContainer.classList.add('shake-it');
 
-    setTimeout(() => {
-        gameContainer.classList.remove('shake-it');
-    }, 300);
+            setTimeout(() => {
+                gameContainer.classList.remove('shake-it');
+            }, 300);
             
             // Use the new constant to set the horizontal speed
             ballSpeedX = direction * BASE_BALL_SPEED; 
@@ -461,7 +511,7 @@
             gameRunning = true; 
             
             // 2. Set the initial positions of everything *before* the loop starts
-            resetBall();     // Centers the ball and gives it initial speed
+            resetBall();     // Centers the ball and gives it initial speed
             updatePaddles(); // Renders the paddles at their initial positions
             
             // 3. Hide the start elements
