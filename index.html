@@ -257,7 +257,7 @@
     <h1>WOULD YOU LIKE TO PLAY A GAME?</h1>
     <p>
         WARNING: FUN IS INITIATED BY DEFIANCE.<br> 
-        IF YOU PRESS BELOW, USE 'W' AND 'S' KEYS.
+        IF YOU PRESS BELOW, USE 'W'/'S' or '↑'/'↓' KEYS.
         <br>BUT SERIOUSLY, DON'T PRESS THAT BUTTON!
     </p>
 
@@ -429,22 +429,26 @@
         }
     
         function updatePaddles() {
-            // --- Left Paddle Movement (USER CONTROL) ---
-            if (keysPressed['w']) {
-                paddleLeftY -= userPaddleSpeed;
-            }
-            if (keysPressed['s']) {
-                paddleLeftY += userPaddleSpeed;
-            }
+    // --- Left Paddle Movement (USER CONTROL) ---
     
-            // --- Right Paddle Movement (AI CONTROL) ---
-            if (ballSpeedX > 0) { 
-                if (paddleRightY + paddleHeight / 2 < ballY) {
-                    paddleRightY += paddleSpeed; // Uses the dynamic paddleSpeed
-                } else if (paddleRightY + paddleHeight / 2 > ballY) {
-                    paddleRightY -= paddleSpeed; // Uses the dynamic paddleSpeed
-                }
-            }
+    // Check for 'w' or 'ArrowUp'
+    if (keysPressed['w'] || keysPressed['arrowup']) {
+        paddleLeftY -= userPaddleSpeed;
+    }
+    // Check for 's' or 'ArrowDown'
+    if (keysPressed['s'] || keysPressed['arrowdown']) {
+        paddleLeftY += userPaddleSpeed;
+    }
+
+    // --- Right Paddle Movement (AI CONTROL) ---
+    if (ballSpeedX > 0) { 
+        if (paddleRightY + paddleHeight / 2 < ballY) {
+            paddleRightY += paddleSpeed; // Uses the dynamic paddleSpeed
+        } else if (paddleRightY + paddleHeight / 2 > ballY) {
+            paddleRightY -= paddleSpeed; // Uses the dynamic paddleSpeed
+        }
+    }
+    
             
             // Keep paddles within bounds
             paddleLeftY = Math.max(0, Math.min(gameHeight - paddleHeight, paddleLeftY));
