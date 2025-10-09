@@ -60,32 +60,29 @@
             animation: glitch-filter 0.5s ease-out;
         }
 
-        /* Glitch/Flicker Animation for H1 Title - NEW BLOCK */
-        @keyframes flicker-glitch {
-            0%, 19.99% {
-                text-shadow: 0 0 10px #39FF14, 0 0 20px #39FF14;
-                transform: translate(0);
-            }
-            20%, 21% {
-                text-shadow: none;
-                transform: translate(-1px, 1px);
-            }
-            22%, 24% {
-                text-shadow: 0 0 5px #00FFFF;
-                transform: translate(2px, -1px);
-            }
-            25%, 29% {
-                text-shadow: 0 0 10px #39FF14;
-                transform: translate(0);
-            }
-            30%, 31% {
-                color: #FF00FF;
-                transform: translate(-3px, 0);
-            }
-            32%, 100% {
+       /* Glitch/Flicker Animation for H1 Title - SUBTLE VERSION */
+       @keyframes flicker-glitch {
+            /* 1. Main State: Subtle Green Glow */
+            0%, 40%, 44%, 58%, 61%, 70%, 75%, 80%, 82%, 100% {
                 color: #39FF14;
-                text-shadow: 0 0 10px #39FF14;
-                transform: translate(0);
+                text-shadow: 0 0 5px #39FF14, 0 0 10px rgba(57, 255, 20, 0.5);
+                transform: translate(0, 0);
+            }
+            /* 2. Short, Minor Flicker (Shadow/Position shift) */
+            41%, 59%, 76%, 83% {
+                text-shadow: 0 0 4px #39FF14;
+                transform: translate(1px, 0);
+            }
+            /* 3. Very Quick, Rare Color/Position Distortions */
+            42%, 60% {
+                color: #00FFFF; /* Quick Cyan Flash */
+                transform: translate(-0.5px, 0.5px);
+                text-shadow: 0 0 8px #00FFFF;
+            }
+            78%, 85% {
+                color: #FF00FF; /* Quick Magenta Flash */
+                transform: translate(0.5px, -0.5px);
+                text-shadow: 0 0 8px #FF00FF;
             }
         }
 
