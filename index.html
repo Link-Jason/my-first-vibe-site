@@ -491,21 +491,25 @@
             ballSpeedY = (Math.random() - 0.5) * 4; 
         }
 
-        // 🛑 UPDATED checkGameOver function with button stability FIX 🛑
-        function checkGameOver() {
-            if (leftScore >= MAX_SCORE || rightScore >= MAX_SCORE) {
-                gameRunning = false; // Stops the game loop
-                
-                // 💡 FIX 2: Stop the screen shake and glitch immediately on game over.
-                gameContainer.classList.remove('shake-it');
-                gameContainer.classList.remove('glitch-screen');
+       // 🛑 DEFINITIVELY FIXED checkGameOver function 🛑
+    function checkGameOver() {
+        if (leftScore >= MAX_SCORE || rightScore >= MAX_SCORE) {
+            gameRunning = false; // Stops the game loop
+            
+            // 1. Immediately remove the shake/glitch classes
+            gameContainer.classList.remove('shake-it');
+            gameContainer.classList.remove('glitch-screen');
 
-                // Hide scores
-                scoreLeft.style.display = 'none';
-                scoreRight.style.display = 'none';
+            // Hide scores immediately
+            scoreLeft.style.display = 'none';
+            scoreRight.style.display = 'none';
+
+            // 2. 💡 CRUCIAL FIX: Wait for 50ms to ensure the CSS animation
+            // is fully finished and the container is stable.
+            setTimeout(() => {
                 
                 let winner = leftScore > rightScore ? "YOU" : "THE AI";
-                let verb = leftScore > rightScore ? "WIN" : "WINS"; 
+                let verb = leftScore > rightScore ? "WIN" : "WINS"; 
                 
                 // 1. Create Game Over Message
                 const gameOverMessage = document.createElement('div');
@@ -519,7 +523,7 @@
                     transform: 'translate(-50%, -50%)',
                     fontFamily: "'Press Start 2P', cursive",
                     fontSize: '20px',
-                    color: '#FF00FF', 
+                    color: '#FF00FF', 
                     textShadow: '0 0 10px #FF00FF, 0 0 20px rgba(255, 0, 255, 0.5)',
                     zIndex: '50'
                 });
@@ -528,13 +532,13 @@
                 const playAgainButton = document.createElement('button');
                 playAgainButton.textContent = "PLAY AGAIN?";
                 
-                // Style the button
+                // Style the button (same as before)
                 Object.assign(playAgainButton.style, {
                     position: 'absolute',
-                    top: '65%', // Adjusted for better vertical placement
+                    top: '65%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    zIndex: '50', 
+                    zIndex: '50', 
                     padding: '10px 20px',
                     background: 'linear-gradient(to bottom, #000000, #1a1a1a)',
                     color: '#39FF14',
@@ -570,8 +574,9 @@
 
                 gameContainer.appendChild(gameOverMessage);
                 gameContainer.appendChild(playAgainButton);
-            }
+            }, 50); // Small 50ms delay is enough to guarantee stability
         }
+    }
 
         function gameLoop() {
             if (gameRunning) { 
