@@ -328,10 +328,10 @@
         let paddleRightY = 160;
         
         // 🛑 CORE GAMEPLAY VARIABLES 🛑
-        let ballSpeedCap = 12; // Maximum ball speed
-        const BALL_SPEED_INCREMENT_ON_HIT = 0.2; // Ball speed up per hit
-        let paddleSpeed = 2.0; // Starting AI speed
-        const AI_SPEED_INCREMENT = 0.2; // AI speed up per score
+        let ballSpeedCap = 12; 
+        const BALL_SPEED_INCREMENT_ON_HIT = 0.2; 
+        let paddleSpeed = 2.0; 
+        const AI_SPEED_INCREMENT = 0.2; 
         
         let userPaddleSpeed = 5; 
         let leftScore = 0;
@@ -346,7 +346,6 @@
         const paddleHeight = 80;
 
 
-        // 🛑 playPaddleHit function with Flash and Pitch Randomization 🛑
         function playPaddleHit(paddleElement) {
             let sound = document.getElementById('paddle-sound');
             
@@ -366,103 +365,90 @@
                 paddleElement.classList.remove('flash');
             }, 100); 
         }
-    
+
         // --- W/S Keyboard Control Setup ---
         const keysPressed = {};
         
         document.addEventListener('keydown', (e) => {
             keysPressed[e.key.toLowerCase()] = true;
         });
-    
+
         document.addEventListener('keyup', (e) => {
             keysPressed[e.key.toLowerCase()] = false;
         });
         // ----------------------------------
-    
+
         function updateBall() {
             ballX += ballSpeedX;
             ballY += ballSpeedY;
-    
+
             // Wall collision (top/bottom)
             if (ballY <= 0 || ballY >= gameHeight - ballSize) {
                 ballSpeedY = -ballSpeedY;
             }
-    
+
             // --- PADDLE COLLISION CHECKS ---
             // Left Paddle
             if (ballX <= 35 && ballY + ballSize >= paddleLeftY && ballY <= paddleLeftY + paddleHeight) {
-                // FIX 1: Snaps the ball to the outside edge of the paddle
                 ballX = 35; 
                 
-                // UPDATED LOGIC: Reversal and Speed Increase (Ball Ramp-Up)
                 ballSpeedX *= -1;
                 if (Math.abs(ballSpeedX) < ballSpeedCap) {
                     ballSpeedX += Math.sign(ballSpeedX) * BALL_SPEED_INCREMENT_ON_HIT;
                 }
                 
-                // Randomize vertical speed slightly
                 ballSpeedY += (Math.random() - 0.5) * 1.5;
-
-                // Play sound/flash effect
                 playPaddleHit(paddleLeft); 
             }
             
             // Right Paddle (AI)
             if (ballX >= gameWidth - 35 - ballSize && ballY + ballSize >= paddleRightY && ballY <= paddleRightY + paddleHeight) {
-                // FIX 1: Snaps the ball to the left edge of the right paddle 
                 ballX = gameWidth - 35 - ballSize; 
                 
-                // UPDATED LOGIC: Reversal and Speed Increase (Ball Ramp-Up)
                 ballSpeedX *= -1; 
                 if (Math.abs(ballSpeedX) < ballSpeedCap) {
                     ballSpeedX += Math.sign(ballSpeedX) * BALL_SPEED_INCREMENT_ON_HIT;
                 }
                 
-                // Randomize vertical speed slightly
                 ballSpeedY += (Math.random() - 0.5) * 1.5;
-
-                // Play sound/flash effect
                 playPaddleHit(paddleRight); 
             }
-    
-            // Reset ball if it goes off screen (Scoring)
+
+            // --- SCORING LOGIC WITH FIX ---
             if (ballX < 0) {
                 rightScore++;
                 scoreRight.textContent = rightScore;
                 
-                // NEW CODE: Increase AI difficulty (Dynamic AI)
+                // 💡 FIX: Only reset ball/shake if the game hasn't just ended
                 if (rightScore < MAX_SCORE) {
                     paddleSpeed += AI_SPEED_INCREMENT;
+                    resetBall(1);
                 }
                 
-                resetBall(1);
-                checkGameOver() 
+                checkGameOver(); 
             }
             if (ballX > gameWidth) {
                 leftScore++;
                 scoreLeft.textContent = leftScore;
                 
-                // NEW CODE: Increase AI difficulty (Dynamic AI)
+                // 💡 FIX: Only reset ball/shake if the game hasn't just ended
                 if (leftScore < MAX_SCORE) {
                     paddleSpeed += AI_SPEED_INCREMENT;
+                    resetBall(-1);
                 }
 
-                resetBall(-1); 
-                checkGameOver()
+                checkGameOver();
             }
-    
+
             ball.style.left = ballX + 'px';
             ball.style.top = ballY + 'px';
         }
-    
+
         function updatePaddles() {
             // --- Left Paddle Movement (USER CONTROL) ---
-            
-            // Check for 'w' or 'ArrowUp'
             if (keysPressed['w'] || keysPressed['arrowup']) {
                 paddleLeftY -= userPaddleSpeed;
             }
-            // Check for 's' or 'ArrowDown'
             if (keysPressed['s'] || keysPressed['arrowdown']) {
                 paddleLeftY += userPaddleSpeed;
             }
@@ -470,50 +456,50 @@
             // --- Right Paddle Movement (AI CONTROL) ---
             if (ballSpeedX > 0) { 
                 if (paddleRightY + paddleHeight / 2 < ballY) {
-                    paddleRightY += paddleSpeed; // Uses the dynamic paddleSpeed
+                    paddleRightY += paddleSpeed; 
                 } else if (paddleRightY + paddleHeight / 2 > ballY) {
-                    paddleRightY -= paddleSpeed; // Uses the dynamic paddleSpeed
+                    paddleRightY -= paddleSpeed; 
                 }
             }
             
             // Keep paddles within bounds
             paddleLeftY = Math.max(0, Math.min(gameHeight - paddleHeight, paddleLeftY));
             paddleRightY = Math.max(0, Math.min(gameHeight - paddleHeight, paddleRightY));
-    
+
             // Apply new positions
             paddleLeft.style.top = paddleLeftY + 'px';
             paddleRight.style.top = paddleRightY + 'px';
         }
-    
-        // 🛑 UPDATED resetBall function with Screen Shake AND Glitch Effect 🛑
+
+        // 🛑 UPDATED resetBall function with conditional Shake/Glitch 🛑
         function resetBall(direction = 1) { 
             ballX = gameWidth / 2;
             ballY = gameHeight / 2;
             
-            // Add Glitch Filter Class
-            gameContainer.classList.add('glitch-screen');
+            // Only apply visual effects if the game is still running
+            if (gameRunning) { 
+                gameContainer.classList.add('glitch-screen');
+                gameContainer.classList.add('shake-it');
 
-            // Add screen shake class
-            gameContainer.classList.add('shake-it');
-
-            setTimeout(() => {
-                // Remove both classes after the animation duration (0.5s for glitch)
-                gameContainer.classList.remove('shake-it');
-                gameContainer.classList.remove('glitch-screen');
-            }, 500); // Timeout increased to 500ms for a full, dramatic effect
+                setTimeout(() => {
+                    gameContainer.classList.remove('shake-it');
+                    gameContainer.classList.remove('glitch-screen');
+                }, 500); 
+            }
             
-            // Use the new constant to set the horizontal speed
             ballSpeedX = direction * BASE_BALL_SPEED; 
-            
-            // Keep the random vertical speed
             ballSpeedY = (Math.random() - 0.5) * 4; 
         }
 
-        // 🛑 UPDATED checkGameOver function with Play Again button and correct grammar 🛑
+        // 🛑 UPDATED checkGameOver function with button stability FIX 🛑
         function checkGameOver() {
             if (leftScore >= MAX_SCORE || rightScore >= MAX_SCORE) {
                 gameRunning = false; // Stops the game loop
                 
+                // 💡 FIX 2: Stop the screen shake and glitch immediately on game over.
+                gameContainer.classList.remove('shake-it');
+                gameContainer.classList.remove('glitch-screen');
+
                 // Hide scores
                 scoreLeft.style.display = 'none';
                 scoreRight.style.display = 'none';
@@ -545,11 +531,10 @@
                 // Style the button
                 Object.assign(playAgainButton.style, {
                     position: 'absolute',
-                    top: '60%',
+                    top: '65%', // Adjusted for better vertical placement
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
                     zIndex: '50', 
-                    marginTop: '20px',
                     padding: '10px 20px',
                     background: 'linear-gradient(to bottom, #000000, #1a1a1a)',
                     color: '#39FF14',
@@ -589,15 +574,13 @@
         }
 
         function gameLoop() {
-            // Only run game logic IF the game is still active
             if (gameRunning) { 
                 updateBall();
                 updatePaddles();
-                // Request the next frame, continuing the loop
                 requestAnimationFrame(gameLoop);
             } 
         }
-    
+
         /* ======================================= */
         /* === FINAL FIXED GAME START LOGIC === */
         /* ======================================= */
@@ -614,7 +597,7 @@
 
             requestAnimationFrame(gameLoop);
         }
-    
+
         // 2. The single, working button listener
         startButton.addEventListener('click', function startGameSequence() {
             let sound = document.getElementById('paddle-sound'); 
