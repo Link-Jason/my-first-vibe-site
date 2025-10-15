@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <title>WOULD YOU LIKE TO PLAY A GAME?</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     
     <style>
         /* ======================================= */
-        /* === ANIMATION & UTILITY CLASSES === */
+        /* === ANIMATION & UTILITY CLASSES (kept as is) === */
         /* ======================================= */
         @keyframes glitch-disappear {
             0% { transform: translate(0); opacity: 1; text-shadow: 0 0 5px #39FF14; }
@@ -24,27 +24,24 @@
             pointer-events: none;
         }
         
-        /* SCREEN SHAKE (on score) */
         @keyframes screen-shake {
             0%, 100% { transform: translate(0, 0); }
-            20% { transform: translate(-1px, -1px); }
-            40% { transform: translate(1px, 1px); }
-            60% { transform: translate(-1px, 1px); }
-            80% { transform: translate(1px, -1px); }
+            20% { transform: translate(-0.5%, -0.5%); }
+            40% { transform: translate(0.5%, 0.5%); }
+            60% { transform: translate(-0.5%, 0.5%); }
+            80% { transform: translate(0.5%, -0.5%); }
         }
 
         .shake-it {
             animation: screen-shake 0.3s ease-out;
         }
 
-        /* IMPACT FLASH (on hit) */
         .pong-ball.flash, .pong-paddle.flash {
-            background-color: #FF00FF; /* Cyberpunk Magenta */
+            background-color: #FF00FF; 
             box-shadow: 0 0 15px #FF00FF, 0 0 30px rgba(255, 0, 255, 0.7);
             transition: background-color 0.1s, box-shadow 0.1s;
         }
 
-        /* GLITCH EFFECT (on score) */
         @keyframes glitch-filter {
             0% { filter: hue-rotate(0deg) blur(0); }
             10% { filter: hue-rotate(90deg) blur(1px); }
@@ -60,35 +57,45 @@
             animation: glitch-filter 0.5s ease-out;
         }
 
-      /* Glitch/Flicker Animation for H1 Title - GREEN JITTER ONLY */
-      @keyframes flicker-glitch {
-            /* 1. Main State: Subtle Green Glow */
+        @keyframes flicker-glitch {
             0%, 50%, 55%, 60%, 65%, 70%, 75%, 80%, 85%, 100% {
                 color: #39FF14;
                 text-shadow: 0 0 5px #39FF14, 0 0 10px rgba(57, 255, 20, 0.5);
                 transform: translate(0, 0);
             }
-            /* 2. Short, Minor Position Jitter (Flicker) */
             51%, 61%, 71%, 81% {
                 text-shadow: 0 0 4px #39FF14;
                 transform: translate(1px, 0);
             }
-            /* 3. Another Jitter pattern */
             53%, 63%, 73%, 83% {
                 text-shadow: 0 0 4px #39FF14;
                 transform: translate(-1px, 0);
             }
-            /* 4. Cross-Axis Jitter */
             58%, 78% {
                 text-shadow: 0 0 6px #39FF14;
                 transform: translate(0.5px, 0.5px);
             }
         }
+        
+        @keyframes dance {
+            0% { transform: rotate(-5deg); }
+            100% { transform: rotate(5deg); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateY(1px) translateX(0); }
+            25% { transform: translateY(1px) translateX(-2px); }
+            75% { transform: translateY(1px) translateX(2px); }
+        }
+        @keyframes scanlines {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(2px); }
+        }
 
+        /* ======================================= */
+        /* === CORE RESPONSIVE STYLES === */
         /* ======================================= */
 
         body {
-            /* Full Retro Body Styles (Your original body code) */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -104,35 +111,44 @@
         }
 
         h1 {
+            font-family: 'Press Start 2P', 'Courier New', cursive;
+            font-size: 5vw; /* Scales with screen width */
+            max-font-size: 24px; /* Caps the size on large screens */
+            animation: flicker-glitch 4s linear infinite alternate; 
             text-align: center;
             color: #39FF14;
             text-shadow: 0 0 10px #39FF14;
-            font-family: 'Press Start 2P', 'Courier New', cursive;
-            font-size: 24px;
             margin-top: 0;
-            margin-bottom: 20px;
+            margin-bottom: 3vh; /* Scales with screen height */
             z-index: 2001;
-            /* APPLIED GLITCH ANIMATION HERE */
-            animation: flicker-glitch 4s linear infinite alternate; 
         }
         
         p {
-            text-align: center;
-            max-width: 600px;
-            margin: 0 auto 30px;
-            padding: 0 20px;
-            line-height: 1.6;
-            color: #00FFFF;
             font-family: 'VT323', 'Courier New', monospace;
-            font-size: 20px;
+            font-size: 3.5vw; /* Scales with screen width */
+            max-font-size: 20px;
+            color: #00FFFF;
+            line-height: 1.6;
+            margin: 0 auto 3vh;
+            padding: 0 5vw; /* Padding scales with screen width */
+            text-align: center;
             z-index: 2001;
         }
 
-        /* Pong Game Styles */
+        /* 💡 RESPONSIVE PONG GAME CONTAINER */
         .pong-game {
             position: relative;
-            width: 600px;
-            height: 400px;
+            /* Prioritize 90% of screen width, max 600px */
+            width: 90vw; 
+            max-width: 600px;
+            /* Maintain 3:2 aspect ratio (400/600 ≈ 0.6666) */
+            height: calc(90vw * 0.6666); 
+            max-height: 400px; 
+            
+            /* Fallback/min size for very small screens */
+            min-width: 300px;
+            min-height: 200px;
+
             background-color: #000000;
             border: 3px solid #39FF14;
             border-radius: 8px;
@@ -141,141 +157,101 @@
             z-index: 2000;
         }
         
-        .pong-ball, .pong-paddle {
+        /* 💡 RESPONSIVE GAME ELEMENTS - Using VIRTUAL HEIGHT/WIDTH */
+        /* These units scale relative to the container size, 
+           but are easier to manage if we stick to the 3:2 ratio */
+        .pong-ball {
             position: absolute;
+            /* Ball size based on original 20px / 400px height = 5% */
+            width: 5%; 
+            height: 5%; 
             background-color: #39FF14;
             border-radius: 2px;
-            box-shadow: 0 0 8px #39FF14;
-        }
-
-        .pong-ball {
-            width: 20px;
-            height: 20px;
             box-shadow: 0 0 10px #39FF14;
         }
         
         .pong-paddle {
-            width: 15px;
-            height: 80px;
+            position: absolute;
+            background-color: #39FF14;
+            border-radius: 2px;
+            box-shadow: 0 0 8px #39FF14;
+            /* Paddle size based on original: 15px/600px width=2.5%, 80px/400px height=20% */
+            width: 2.5%; 
+            height: 20%; 
         }
         
+        /* Position paddles using % of container width, not fixed pixels */
         .paddle-left {
-            left: 20px;
-            top: 160px; /* fixed centered position */
+            left: 3.33%; /* 20px / 600px */
+            top: 40%; /* Initial Y position will be set by JS */
         }
 
         .paddle-right {
-            right: 20px;
-            top: 160px; /* fixed centered position */
+            right: 3.33%;
+            top: 40%;
         }
 
-        
+        /* 💡 RESPONSIVE SCORES */
         .score {
             position: absolute;
-            top: 20px;
+            top: 5%;
             font-family: 'Press Start 2P', cursive;
-            font-size: 16px;
+            font-size: 3vw; /* Scales with screen width */
+            max-font-size: 16px;
             color: #39FF14;
             text-shadow: 0 0 5px #39FF14;
             z-index: 10;
         }
         
-        .score-left { left: 150px; }
-        .score-right { right: 150px; }
+        /* Position scores using % of container width */
+        .score-left { left: 25%; } /* 150px / 600px */
+        .score-right { right: 25%; }
 
-        /* Button & Skeleton Styles */
+        /* 💡 RESPONSIVE BUTTON */
         button {
-            position: relative;
-            padding: 15px 40px;
-            font-size: 16px;
-            font-family: 'Press Start 2P', 'Courier New', cursive;
-            background: linear-gradient(to bottom, #000000, #1a1a1a);
-            color: #39FF14;
-            border: 2px solid #39FF14;
-            border-radius: 8px;
-            cursor: pointer;
-            box-shadow: 0 0 15px rgba(57, 255, 20, 0.4), 
-                        0 4px 8px rgba(0, 0, 0, 0.3),
-                        inset 0 1px 0 rgba(57, 255, 20, 0.2);
-            text-shadow: 0 0 5px #39FF14;
-            transition: all 0.2s ease;
-        }
-        button:hover {
-            background: linear-gradient(to bottom, #1a1a1a, #000000);
-            box-shadow: 0 0 20px rgba(57, 255, 20, 0.6), 
-                        0 2px 4px rgba(0, 0, 0, 0.4),
-                        inset 0 1px 0 rgba(57, 255, 20, 0.3);
-            transform: translateY(1px);
-            animation: shake 0.5s ease-in-out infinite;
-        }
-        .skeleton {
-            display: flex;
-            width: 40px;
-            height: 40px;
-            background-color: #677872;
-            border: 2px solid #39FF14;
-            border-radius: 4px;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            padding: 4px;
-            animation: dance 1s ease-in-out infinite alternate;
-            box-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
-        }
-        .skeleton-left { margin-right: 25px; }
-        .skeleton-right { margin-left: 25px; }
-        .button-container {
-            margin-top: 30px; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
+            padding: 3vw 6vw; /* Scales with screen width */
+            font-size: 3vw;
+            max-font-size: 16px;
         }
         
-        @keyframes dance {
-            0% { transform: rotate(-5deg); }
-            100% { transform: rotate(5deg); }
-        }
-        @keyframes shake {
-            0%, 100% { transform: translateY(1px) translateX(0); }
-            25% { transform: translateY(1px) translateX(-2px); }
-            75% { transform: translateY(1px) translateX(2px); }
+        /* 💡 MEDIA QUERY FOR SMALL SCREENS (Phones) */
+        /* Reduce padding, font size, and move controls for very small screens */
+        @media (max-width: 480px) {
+            h1 { font-size: 7vw; margin-bottom: 2vh; }
+            p { font-size: 4vw; padding: 0 2vw; margin-bottom: 2vh; }
+            .score { font-size: 5vw; }
+            button { 
+                font-size: 4vw; 
+                padding: 4vw 8vw;
+                margin-top: 4vh;
+            }
+            .skeleton {
+                width: 8vw;
+                height: 8vw;
+                font-size: 5vw;
+                border-width: 1px;
+            }
+            .skeleton-left { margin-right: 15px; }
+            .skeleton-right { margin-left: 15px; }
         }
 
-        /* CRT Scanline Overlay */
-        .crt-overlay {
+        /* Overlays (No change needed) */
+        .crt-overlay, .noise-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             pointer-events: none;
             z-index: 1000;
-            background: 
-                linear-gradient(transparent 50%, rgba(0, 255, 255, 0.15) 50%),
-                linear-gradient(90deg, transparent 50%, rgba(0, 255, 255, 0.05) 50%);
+        }
+        .crt-overlay {
+            background: linear-gradient(transparent 50%, rgba(0, 255, 255, 0.15) 50%), linear-gradient(90deg, transparent 50%, rgba(0, 255, 255, 0.05) 50%);
             background-size: 100% 2px, 4px 100%;
             animation: scanlines 0.08s linear infinite;
         }
-        
-        /* Noise Texture */
         .noise-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
             z-index: 999;
             opacity: 0.02;
-            background-image: 
-                radial-gradient(circle at 20% 50%, transparent 20%, rgba(255, 255, 255, 0.1) 21%, rgba(255, 255, 255, 0.1) 34%, transparent 35%, transparent),
-                linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, 0.05) 75%, rgba(255, 255, 255, 0.05) 76%, transparent 77%, transparent);
-        }
-        
-        @keyframes scanlines {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(2px); }
+            background-image: radial-gradient(circle at 20% 50%, transparent 20%, rgba(255, 255, 255, 0.1) 21%, rgba(255, 255, 255, 0.1) 34%, transparent 35%, transparent), linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, 0.05) 75%, rgba(255, 255, 255, 0.05) 76%, transparent 77%, transparent);
         }
     </style>
 </head>
@@ -284,7 +260,8 @@
     <h1>WOULD YOU LIKE TO PLAY A GAME?</h1>
     <p>
         WARNING: FUN IS INITIATED BY DEFIANCE.<br> 
-        IF YOU PRESS BELOW, USE **'W'/'S' or '↑'/'↓' KEYS**.
+        <span class="desktop-only">IF YOU PRESS BELOW, USE **'W'/'S' or '↑'/'↓' KEYS**.</span>
+        <span class="mobile-only">IF YOU PRESS BELOW, **DRAG YOUR FINGER** ON THE SCREEN TO MOVE THE PADDLE.</span>
         <br>BUT SERIOUSLY, DON'T PRESS THAT BUTTON!
     </p>
 
@@ -314,68 +291,109 @@
         const scoreRight = document.querySelector('.score-right');
         const gameContainer = document.getElementById('gameContainer'); 
         
-        // --- Game Setup Elements ---
         const startButton = document.getElementById('startButton');
         const skeletonLeft = document.querySelector('.skeleton-left');
         const skeletonRight = document.querySelector('.skeleton-right');
-        
-        let ballX = 300;
-        let ballY = 200;
+
+        // **VIRTUAL GAME DIMENSIONS (Used for all logic/calculations)**
+        // All positions and speeds will be calculated relative to this 600x400 "box"
+        const VIRTUAL_GAME_WIDTH = 600;
+        const VIRTUAL_GAME_HEIGHT = 400;
+        const VIRTUAL_BALL_SIZE = 20;
+        const VIRTUAL_PADDLE_HEIGHT = 80;
+
+        let ballX = VIRTUAL_GAME_WIDTH / 2;
+        let ballY = VIRTUAL_GAME_HEIGHT / 2;
         const BASE_BALL_SPEED = 4;
         let ballSpeedX = BASE_BALL_SPEED; 
         let ballSpeedY = 2; 
         let paddleLeftY = 160;
         let paddleRightY = 160;
         
-        // 🛑 CORE GAMEPLAY VARIABLES 🛑
         let ballSpeedCap = 12; 
         const BALL_SPEED_INCREMENT_ON_HIT = 0.2; 
-        let paddleSpeed = 2.0; 
+        let paddleSpeed = 2.0; // AI Speed
         const AI_SPEED_INCREMENT = 0.2; 
         
-        let userPaddleSpeed = 5; 
+        let userPaddleSpeed = 5; // User Paddle Speed
         let leftScore = 0;
         let rightScore = 0;
 
         const MAX_SCORE = 5; 
         let gameRunning = false; 
-        
-        const gameWidth = 600;
-        const gameHeight = 400;
-        const ballSize = 20;
-        const paddleHeight = 80;
 
+        // 💡 Function to get the actual scaling factor
+        function getScaleRatio() {
+            // Get the current screen dimensions of the game container
+            const currentWidth = gameContainer.offsetWidth;
+            const currentHeight = gameContainer.offsetHeight;
+            
+            // Calculate ratio based on the virtual width (since it's a 3:2 aspect ratio)
+            return currentWidth / VIRTUAL_GAME_WIDTH; 
+        }
 
         function playPaddleHit(paddleElement) {
             let sound = document.getElementById('paddle-sound');
-            
-            // 1. Audio: Reset and play with randomized pitch
             sound.pause(); 
             sound.currentTime = 0; 
             sound.playbackRate = 1 + (Math.random() * 0.5 - 0.25); 
-            sound.play();
+            sound.play().catch(e => {});
 
-            // 2. Visual: Flash the paddle and ball
             ball.classList.add('flash');
             paddleElement.classList.add('flash');
             
-            // Remove the flash class after a short delay
             setTimeout(() => {
                 ball.classList.remove('flash');
                 paddleElement.classList.remove('flash');
             }, 100); 
         }
 
-        // --- W/S Keyboard Control Setup ---
+        // --- Desktop Keyboard Control ---
         const keysPressed = {};
-        
         document.addEventListener('keydown', (e) => {
             keysPressed[e.key.toLowerCase()] = true;
         });
-
         document.addEventListener('keyup', (e) => {
             keysPressed[e.key.toLowerCase()] = false;
         });
+        
+        // --- Mobile Touch Control Setup (NEW) ---
+        function handleTouchMove(e) {
+            if (!gameRunning) return;
+            e.preventDefault(); 
+            
+            // Get the current scale
+            const scaleRatio = getScaleRatio();
+            
+            // Get the actual bounding box of the game container
+            const gameRect = gameContainer.getBoundingClientRect();
+            
+            // Get the touch Y position relative to the document
+            const touchY = e.touches[0].clientY; 
+            
+            // Calculate the touch Y position relative to the game container's top edge (in screen pixels)
+            const relativeY = touchY - gameRect.top;
+            
+            // Convert the screen-pixel Y (relativeY) back to a VIRTUAL Y position
+            // by dividing by the scale ratio.
+            let normalizedY = relativeY / scaleRatio;
+            
+            // Adjust the paddle's VIRTUAL Y based on the touch position
+            // Center the paddle on the touch point.
+            let newPaddleTop = normalizedY - (VIRTUAL_PADDLE_HEIGHT / 2);
+            
+            // Keep paddles within VIRTUAL bounds
+            newPaddleTop = Math.max(0, Math.min(VIRTUAL_GAME_HEIGHT - VIRTUAL_PADDLE_HEIGHT, newPaddleTop));
+
+            // Update the paddle position variable
+            paddleLeftY = newPaddleTop;
+        }
+
+        // Apply touch listeners only after the game starts
+        function setupTouchControls() {
+            gameContainer.addEventListener('touchstart', handleTouchMove, { passive: false });
+            gameContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
+        }
         // ----------------------------------
 
         function updateBall() {
@@ -383,256 +401,62 @@
             ballY += ballSpeedY;
 
             // Wall collision (top/bottom)
-            if (ballY <= 0 || ballY >= gameHeight - ballSize) {
+            if (ballY <= 0 || ballY >= VIRTUAL_GAME_HEIGHT - VIRTUAL_BALL_SIZE) {
                 ballSpeedY = -ballSpeedY;
             }
 
-            // --- PADDLE COLLISION CHECKS ---
-            // Left Paddle
-            if (ballX <= 35 && ballY + ballSize >= paddleLeftY && ballY <= paddleLeftY + paddleHeight) {
+            // Left Paddle Collision: ballX <= 20 + 15 (paddle width)
+            if (ballX <= 35 && ballY + VIRTUAL_BALL_SIZE >= paddleLeftY && ballY <= paddleLeftY + VIRTUAL_PADDLE_HEIGHT) {
                 ballX = 35; 
-                
                 ballSpeedX *= -1;
                 if (Math.abs(ballSpeedX) < ballSpeedCap) {
                     ballSpeedX += Math.sign(ballSpeedX) * BALL_SPEED_INCREMENT_ON_HIT;
                 }
-                
                 ballSpeedY += (Math.random() - 0.5) * 1.5;
                 playPaddleHit(paddleLeft); 
             }
             
-            // Right Paddle (AI)
-            if (ballX >= gameWidth - 35 - ballSize && ballY + ballSize >= paddleRightY && ballY <= paddleRightY + paddleHeight) {
-                ballX = gameWidth - 35 - ballSize; 
-                
+            // Right Paddle (AI) Collision: ballX >= 600 - 35 - 20 (paddle width/ball size)
+            if (ballX >= VIRTUAL_GAME_WIDTH - 35 - VIRTUAL_BALL_SIZE && ballY + VIRTUAL_BALL_SIZE >= paddleRightY && ballY <= paddleRightY + VIRTUAL_PADDLE_HEIGHT) {
+                ballX = VIRTUAL_GAME_WIDTH - 35 - VIRTUAL_BALL_SIZE; 
                 ballSpeedX *= -1; 
                 if (Math.abs(ballSpeedX) < ballSpeedCap) {
                     ballSpeedX += Math.sign(ballSpeedX) * BALL_SPEED_INCREMENT_ON_HIT;
                 }
-                
                 ballSpeedY += (Math.random() - 0.5) * 1.5;
                 playPaddleHit(paddleRight); 
             }
 
-            // --- SCORING LOGIC WITH FIX ---
+            // --- SCORING LOGIC ---
             if (ballX < 0) {
                 rightScore++;
                 scoreRight.textContent = rightScore;
-                
-                // 💡 FIX: Only reset ball/shake if the game hasn't just ended
                 if (rightScore < MAX_SCORE) {
                     paddleSpeed += AI_SPEED_INCREMENT;
                     resetBall(1);
                 }
-                
                 checkGameOver(); 
             }
-            if (ballX > gameWidth) {
+            if (ballX > VIRTUAL_GAME_WIDTH) {
                 leftScore++;
                 scoreLeft.textContent = leftScore;
-                
-                // 💡 FIX: Only reset ball/shake if the game hasn't just ended
                 if (leftScore < MAX_SCORE) {
                     paddleSpeed += AI_SPEED_INCREMENT;
                     resetBall(-1);
                 }
-
                 checkGameOver();
             }
 
-            ball.style.left = ballX + 'px';
-            ball.style.top = ballY + 'px';
+            // 💡 APPLY POSITIONS - The position variables (ballX, ballY) are VIRTUAL (0-600, 0-400),
+            // so we convert them to percentage for CSS display.
+            ball.style.left = (ballX / VIRTUAL_GAME_WIDTH * 100) + '%';
+            ball.style.top = (ballY / VIRTUAL_GAME_HEIGHT * 100) + '%';
         }
 
         function updatePaddles() {
-            // --- Left Paddle Movement (USER CONTROL) ---
-            if (keysPressed['w'] || keysPressed['arrowup']) {
-                paddleLeftY -= userPaddleSpeed;
-            }
-            if (keysPressed['s'] || keysPressed['arrowdown']) {
-                paddleLeftY += userPaddleSpeed;
-            }
+            // --- Left Paddle Movement (USER CONTROL - Keyboard) ---
+            // Only respond to keyboard if we aren't using touch
+            const isTouchDevice = ('ontouchstart' in window);
 
-            // --- Right Paddle Movement (AI CONTROL) ---
-            if (ballSpeedX > 0) { 
-                if (paddleRightY + paddleHeight / 2 < ballY) {
-                    paddleRightY += paddleSpeed; 
-                } else if (paddleRightY + paddleHeight / 2 > ballY) {
-                    paddleRightY -= paddleSpeed; 
-                }
-            }
-            
-            // Keep paddles within bounds
-            paddleLeftY = Math.max(0, Math.min(gameHeight - paddleHeight, paddleLeftY));
-            paddleRightY = Math.max(0, Math.min(gameHeight - paddleHeight, paddleRightY));
-
-            // Apply new positions
-            paddleLeft.style.top = paddleLeftY + 'px';
-            paddleRight.style.top = paddleRightY + 'px';
-        }
-
-        // 🛑 UPDATED resetBall function with conditional Shake/Glitch 🛑
-        function resetBall(direction = 1) { 
-            ballX = gameWidth / 2;
-            ballY = gameHeight / 2;
-            
-            // Only apply visual effects if the game is still running
-            if (gameRunning) { 
-                gameContainer.classList.add('glitch-screen');
-                gameContainer.classList.add('shake-it');
-
-                setTimeout(() => {
-                    gameContainer.classList.remove('shake-it');
-                    gameContainer.classList.remove('glitch-screen');
-                }, 500); 
-            }
-            
-            ballSpeedX = direction * BASE_BALL_SPEED; 
-            ballSpeedY = (Math.random() - 0.5) * 4; 
-        }
-
-      // 🛑 DEFINITIVE FIX: Fixed Overlay checkGameOver function 🛑
-    function checkGameOver() {
-        if (leftScore >= MAX_SCORE || rightScore >= MAX_SCORE) {
-            gameRunning = false; // Stops the game loop
-            
-            // 1. STABILIZE THE GAME CONTAINER
-            gameContainer.classList.remove('shake-it');
-            gameContainer.classList.remove('glitch-screen');
-            gameContainer.style.animation = 'none'; 
-            gameContainer.style.transform = 'translate(0, 0)'; 
-            
-            // Hide scores
-            scoreLeft.style.display = 'none';
-            scoreRight.style.display = 'none';
-            
-            // --- NEW: CREATE STATIC OVERLAY ---
-            const overlay = document.createElement('div');
-            Object.assign(overlay.style, {
-                position: 'fixed', // Fixed positioning is key
-                top: '0',
-                left: '0',
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                zIndex: '9000', // Ensure it's on top of everything
-                pointerEvents: 'auto'
-            });
-            document.body.appendChild(overlay);
-
-            
-            let winner = leftScore > rightScore ? "YOU" : "THE AI";
-            let verb = leftScore > rightScore ? "WIN" : "WINS"; 
-            
-            // 1. Create Game Over Message
-            const gameOverMessage = document.createElement('div');
-            gameOverMessage.textContent = `GAME OVER. ${winner} ${verb}!`;
-            
-            // Style the message (Relative to the new overlay center)
-            Object.assign(gameOverMessage.style, {
-                fontFamily: "'Press Start 2P', cursive",
-                fontSize: '20px',
-                color: '#FF00FF', 
-                textShadow: '0 0 10px #FF00FF, 0 0 20px rgba(255, 0, 255, 0.5)',
-                marginBottom: '40px' // Spacing above the button
-            });
-            
-            // 2. Create Play Again Button
-            const playAgainButton = document.createElement('button');
-            playAgainButton.textContent = "PLAY AGAIN?";
-            
-            // Style the button (No need for absolute positioning or translate(-50%) anymore)
-            Object.assign(playAgainButton.style, {
-                zIndex: '50', 
-                padding: '10px 20px',
-                background: 'linear-gradient(to bottom, #000000, #1a1a1a)',
-                color: '#39FF14',
-                border: '2px solid #39FF14',
-                borderRadius: '8px',
-                boxShadow: '0 0 15px rgba(57, 255, 20, 0.4)'
-            });
-            
-            // 3. Add Restart Logic
-            playAgainButton.addEventListener('click', () => {
-                // Clear the forced gameContainer styles
-                gameContainer.style.animation = ''; 
-                gameContainer.style.transform = ''; 
-                
-                // Remove the entire overlay
-                overlay.remove(); 
-                
-                // Reset scores and display
-                leftScore = 0;
-                rightScore = 0;
-                scoreLeft.textContent = '0';
-                scoreRight.textContent = '0';
-                scoreLeft.style.display = 'block';
-                scoreRight.style.display = 'block';
-
-                // Reset paddle positions and AI speed
-                paddleLeftY = 160;
-                paddleRightY = 160;
-                paddleSpeed = 2.0;
-                
-                // Restart the game loop
-                resetBall();
-                gameRunning = true;
-                requestAnimationFrame(gameLoop);
-            });
-
-            // Append to the static overlay, not the gameContainer
-            overlay.appendChild(gameOverMessage);
-            overlay.appendChild(playAgainButton);
-        }
-    }
-
-        function gameLoop() {
-            if (gameRunning) { 
-                updateBall();
-                updatePaddles();
-                requestAnimationFrame(gameLoop);
-            } 
-        }
-
-        /* ======================================= */
-        /* === FINAL FIXED GAME START LOGIC === */
-        /* ======================================= */
-        
-        // 1. Function to handle the true game start
-        function launchGame() {
-            gameRunning = true; 
-            resetBall(); 
-            updatePaddles(); 
-            
-            startButton.style.display = 'none';
-            skeletonLeft.style.display = 'none';
-            skeletonRight.style.display = 'none';
-
-            requestAnimationFrame(gameLoop);
-        }
-
-        // 2. The single, working button listener
-        startButton.addEventListener('click', function startGameSequence() {
-            let sound = document.getElementById('paddle-sound'); 
-            if (sound) {
-                sound.play().catch(e => {}); 
-            }
-
-            this.textContent = "SOUND ACTIVATED. INITIATING GAME."; 
-            this.classList.add('glitch-start');
-            
-            skeletonLeft.style.animation = 'none';
-            skeletonRight.style.animation = 'none';
-
-            launchGame(); 
-            
-            this.removeEventListener('click', startGameSequence);
-        });
-
-        /* ======================================= */
-    </script>
-</body>
-</html>
+            if (!isTouchDevice) {
+                if (keysPressed['w'] || keysPressed
