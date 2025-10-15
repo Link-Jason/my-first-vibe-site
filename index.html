@@ -92,17 +92,23 @@
         }
 
         /* ======================================= */
-        /* === CORE RESPONSIVE STYLES (Final) === */
+        /* === CORE RESPONSIVE STYLES (Final Scroll Lock) === */
         /* ======================================= */
 
         body {
+            /* FIX: Lock the viewport to prevent mobile scrolling/address bar pop-in */
+            overflow: hidden; 
+            position: fixed; 
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* END FIX */
+
             display: flex;
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            
-            min-height: 100vh;
-            height: auto; 
             
             margin: 0;
             font-family: 'VT323', 'Courier New', monospace;
@@ -151,7 +157,7 @@
             padding-bottom: 66.66%; 
             height: 0; 
             
-            /* FIX: Prevents the mobile browser from scrolling the page when you drag the paddle */
+            /* Prevents the mobile browser from scrolling the page when you drag the paddle */
             touch-action: none; 
             
             background-color: #000000;
@@ -170,7 +176,7 @@
             margin-top: 3vh; 
         }
         
-        /* RESPONSIVE GAME ELEMENTS - PERFECT CIRCLE BALL FIX */
+        /* RESPONSIVE GAME ELEMENTS - PERFECT CIRCLE BALL */
         .pong-ball {
             position: absolute;
             width: 5%; 
@@ -208,7 +214,7 @@
         .score-left { left: 25%; } 
         .score-right { right: 25%; }
 
-        /* RESPONSIVE BUTTON - SLIMMER PADDING FIX */
+        /* RESPONSIVE BUTTON */
         button {
             padding: 2vw 6vw; 
             font-size: clamp(14px, 3vw, 16px); 
@@ -378,7 +384,6 @@
         }
 
         function setupTouchControls() {
-            // Note: The touch-action: none; in CSS is the primary fix, but these listeners are still needed for logic.
             gameContainer.addEventListener('touchstart', handleTouchMove, { passive: false });
             gameContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
         }
