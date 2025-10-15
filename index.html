@@ -92,7 +92,7 @@
         }
 
         /* ======================================= */
-        /* === CORE RESPONSIVE STYLES (Final Scroll Lock) === */
+        /* === CORE RESPONSIVE STYLES (Final) === */
         /* ======================================= */
 
         body {
@@ -157,7 +157,7 @@
             padding-bottom: 66.66%; 
             height: 0; 
             
-            /* Prevents the mobile browser from scrolling the page when you drag the paddle */
+            /* Prevents the mobile browser from scrolling the game area */
             touch-action: none; 
             
             background-color: #000000;
@@ -176,15 +176,14 @@
             margin-top: 3vh; 
         }
         
-        /* RESPONSIVE GAME ELEMENTS - PERFECT CIRCLE BALL */
+        /* RESPONSIVE GAME ELEMENTS - REVERTED TO SQUARE BALL */
         .pong-ball {
             position: absolute;
             width: 5%; 
-            height: 0; 
-            padding-bottom: 5%; 
+            height: 5%; /* Reverted from padding-bottom */
             
             background-color: #39FF14;
-            border-radius: 50%; 
+            border-radius: 2px; /* Reverted to square */
             box-shadow: 0 0 10px #39FF14;
         }
         
@@ -339,6 +338,12 @@
         const MAX_SCORE = 5; 
         let gameRunning = false; 
 
+        // NEW FIX: Global Touch Prevention (Most aggressive method)
+        document.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+        }, { passive: false });
+
+
         function getScaleRatio() {
             const currentWidth = gameContainer.offsetWidth;
             return currentWidth / VIRTUAL_GAME_WIDTH; 
@@ -366,6 +371,7 @@
         
         function handleTouchMove(e) {
             if (!gameRunning) return;
+            // e.preventDefault() is already handled globally above, but keeping it here doesn't hurt.
             e.preventDefault(); 
             
             const scaleRatio = getScaleRatio();
