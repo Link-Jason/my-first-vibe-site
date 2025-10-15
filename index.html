@@ -101,7 +101,6 @@
             align-items: center;
             flex-direction: column;
             
-            /* Use min-height so content can expand but stays centered */
             min-height: 100vh;
             height: auto; 
             
@@ -137,25 +136,19 @@
             z-index: 2001;
         }
 
-        /* NEW WRAPPER: CONTROLS GLOBAL SIZE AND MAX-WIDTH */
+        /* NEW WRAPPER: CONTROLS GLOBAL SIZE AND MAX-WIDTH (CRITICAL FIX) */
         .pong-wrapper {
-            /* Set the responsive width and the absolute max-width */
             width: 90vw;
             max-width: 600px; 
-            
-            /* Add margin below to separate the button */
-            margin: 0 auto 3vh; 
+            margin: 0 auto; /* Removed bottom margin, letting button-container handle space */
         }
 
         /* PONG GAME CONTAINER: ONLY RESPONSIBLE FOR ASPECT RATIO */
         .pong-game {
             position: relative;
             
-            /* Force the game to take 100% of the wrapper's width (max 600px) */
             width: 100%; 
-            
-            /* Aspect Ratio Trick: 66.66% of the 100% width (which is capped at 600px) */
-            padding-bottom: 66.66%; 
+            padding-bottom: 66.66%; /* 400/600 = 0.6666 */
             height: 0; 
             
             background-color: #000000;
@@ -164,6 +157,14 @@
             box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
             overflow: hidden;
             z-index: 2000;
+        }
+        
+        /* NEW FIX: Layout for the button and skeletons */
+        .button-container {
+            display: flex;
+            align-items: center; 
+            justify-content: center; 
+            margin-top: 3vh; /* Add space between game box and button */
         }
         
         /* RESPONSIVE GAME ELEMENTS */
