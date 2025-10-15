@@ -8,21 +8,91 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     
     <style>
-        /* ... (Animations and Utility Classes remain unchanged) ... */
-        @keyframes glitch-disappear { /* ... */ }
-        .glitch-start { /* ... */ }
-        @keyframes screen-shake { /* ... */ }
-        .shake-it { /* ... */ }
-        .pong-ball.flash, .pong-paddle.flash { /* ... */ }
-        @keyframes glitch-filter { /* ... */ }
-        .glitch-screen { /* ... */ }
-        @keyframes flicker-glitch { /* ... */ }
-        @keyframes dance { /* ... */ }
-        @keyframes shake { /* ... */ }
-        @keyframes scanlines { /* ... */ }
+        /* ======================================= */
+        /* === ANIMATION & UTILITY CLASSES (kept as is) === */
+        /* ======================================= */
+        @keyframes glitch-disappear {
+            0% { transform: translate(0); opacity: 1; text-shadow: 0 0 5px #39FF14; }
+            10% { transform: translate(5px, 5px) skewX(20deg); color: #FF00FF; }
+            20% { transform: translate(-5px, -5px) skewX(-20deg); color: #00FFFF; }
+            30% { transform: translate(10px, 0); opacity: 0.9; text-shadow: 0 0 15px #FF00FF; }
+            100% { transform: translate(0, 100px); opacity: 0; }
+        }
+
+        .glitch-start {
+            animation: glitch-disappear 0.8s forwards;
+            pointer-events: none;
+        }
+        
+        @keyframes screen-shake {
+            0%, 100% { transform: translate(0, 0); }
+            20% { transform: translate(-0.5%, -0.5%); }
+            40% { transform: translate(0.5%, 0.5%); }
+            60% { transform: translate(-0.5%, 0.5%); }
+            80% { transform: translate(0.5%, -0.5%); }
+        }
+
+        .shake-it {
+            animation: screen-shake 0.3s ease-out;
+        }
+
+        .pong-ball.flash, .pong-paddle.flash {
+            background-color: #FF00FF; 
+            box-shadow: 0 0 15px #FF00FF, 0 0 30px rgba(255, 0, 255, 0.7);
+            transition: background-color 0.1s, box-shadow 0.1s;
+        }
+
+        @keyframes glitch-filter {
+            0% { filter: hue-rotate(0deg) blur(0); }
+            10% { filter: hue-rotate(90deg) blur(1px); }
+            20% { filter: hue-rotate(0deg) blur(0); }
+            30% { filter: hue-rotate(180deg) blur(2px); }
+            40% { filter: hue-rotate(0deg) blur(0); }
+            50% { filter: hue-rotate(270deg) blur(1px); }
+            60% { filter: hue-rotate(0deg) blur(0); }
+            100% { filter: hue-rotate(0deg) blur(0); }
+        }
+
+        .glitch-screen {
+            animation: glitch-filter 0.5s ease-out;
+        }
+
+        @keyframes flicker-glitch {
+            0%, 50%, 55%, 60%, 65%, 70%, 75%, 80%, 85%, 100% {
+                color: #39FF14;
+                text-shadow: 0 0 5px #39FF14, 0 0 10px rgba(57, 255, 20, 0.5);
+                transform: translate(0, 0);
+            }
+            51%, 61%, 71%, 81% {
+                text-shadow: 0 0 4px #39FF14;
+                transform: translate(1px, 0);
+            }
+            53%, 63%, 73%, 83% {
+                text-shadow: 0 0 4px #39FF14;
+                transform: translate(-1px, 0);
+            }
+            58%, 78% {
+                text-shadow: 0 0 6px #39FF14;
+                transform: translate(0.5px, 0.5px);
+            }
+        }
+        
+        @keyframes dance {
+            0% { transform: rotate(-5deg); }
+            100% { transform: rotate(5deg); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateY(1px) translateX(0); }
+            25% { transform: translateY(1px) translateX(-2px); }
+            75% { transform: translateY(1px) translateX(2px); }
+        }
+        @keyframes scanlines {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(2px); }
+        }
 
         /* ======================================= */
-        /* === CORE RESPONSIVE STYLES (Final Fixes) === */
+        /* === CORE RESPONSIVE STYLES (Final Structural Fix) === */
         /* ======================================= */
 
         body {
@@ -67,20 +137,26 @@
             z-index: 2001;
         }
 
-        /* RESPONSIVE PONG GAME CONTAINER - ASPECT RATIO FIX APPLIED */
+        /* NEW WRAPPER: CONTROLS GLOBAL SIZE AND MAX-WIDTH */
+        .pong-wrapper {
+            /* Set the responsive width and the absolute max-width */
+            width: 90vw;
+            max-width: 600px; 
+            
+            /* Add margin below to separate the button */
+            margin: 0 auto 3vh; 
+        }
+
+        /* PONG GAME CONTAINER: ONLY RESPONSIBLE FOR ASPECT RATIO */
         .pong-game {
             position: relative;
             
-            /* FORCED WIDTH based on viewport to ensure padding-bottom works */
-            width: 90vw; 
+            /* Force the game to take 100% of the wrapper's width (max 600px) */
+            width: 100%; 
             
-            max-width: 600px; 
-            
-            /* Aspect Ratio Trick: Set height using padding-bottom based on the 3:2 ratio */
+            /* Aspect Ratio Trick: 66.66% of the 100% width (which is capped at 600px) */
             padding-bottom: 66.66%; 
             height: 0; 
-            
-            min-width: 300px;
             
             background-color: #000000;
             border: 3px solid #39FF14;
@@ -109,15 +185,8 @@
             height: 20%; 
         }
         
-        .paddle-left {
-            left: 3.33%; 
-            top: 40%; 
-        }
-
-        .paddle-right {
-            right: 3.33%;
-            top: 40%;
-        }
+        .paddle-left { left: 3.33%; top: 40%; } 
+        .paddle-right { right: 3.33%; top: 40%; }
 
         /* RESPONSIVE SCORES */
         .score {
@@ -136,7 +205,6 @@
         /* RESPONSIVE BUTTON - MINIMUM SIZE INCREASED */
         button {
             padding: 3vw 6vw; 
-            /* Increased minimum font size from 12px to 14px */
             font-size: clamp(14px, 3vw, 16px); 
             position: relative;
             font-family: 'Press Start 2P', 'Courier New', cursive;
@@ -201,12 +269,14 @@
         <br>BUT SERIOUSLY, DON'T PRESS THAT BUTTON!
     </p>
 
-    <div class="pong-game" id="gameContainer">
-        <div class="score score-left">0</div>
-        <div class="score score-right">0</div>
-        <div class="pong-ball" id="ball"></div>
-        <div class="pong-paddle paddle-left" id="paddleLeft"></div>
-        <div class="pong-paddle paddle-right" id="paddleRight"></div>
+    <div class="pong-wrapper">
+        <div class="pong-game" id="gameContainer">
+            <div class="score score-left">0</div>
+            <div class="score score-right">0</div>
+            <div class="pong-ball" id="ball"></div>
+            <div class="pong-paddle paddle-left" id="paddleLeft"></div>
+            <div class="pong-paddle paddle-right" id="paddleRight"></div>
+        </div>
     </div>
     
     <div class="button-container">
@@ -219,7 +289,7 @@
     <div class="crt-overlay"></div>
     
     <script>
-        // Pong Game Logic 
+        // Pong Game Logic (All JavaScript remains unchanged as it uses virtual coordinates)
         const ball = document.getElementById('ball');
         const paddleLeft = document.getElementById('paddleLeft');
         const paddleRight = document.getElementById('paddleRight');
