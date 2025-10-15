@@ -9,7 +9,7 @@
     
     <style>
         /* ======================================= */
-        /* === ANIMATION & UTILITY CLASSES (kept as is) === */
+        /* === ANIMATION & UTILITY CLASSES === */
         /* ======================================= */
         @keyframes glitch-disappear {
             0% { transform: translate(0); opacity: 1; text-shadow: 0 0 5px #39FF14; }
@@ -92,7 +92,7 @@
         }
 
         /* ======================================= */
-        /* === CORE RESPONSIVE STYLES (Final Structural Fix) === */
+        /* === CORE RESPONSIVE STYLES (Final) === */
         /* ======================================= */
 
         body {
@@ -136,14 +136,14 @@
             z-index: 2001;
         }
 
-        /* NEW WRAPPER: CONTROLS GLOBAL SIZE AND MAX-WIDTH (CRITICAL FIX) */
+        /* WRAPPER: CONTROLS GLOBAL SIZE AND MAX-WIDTH (Aspect Ratio Anchor) */
         .pong-wrapper {
             width: 90vw;
             max-width: 600px; 
-            margin: 0 auto; /* Removed bottom margin, letting button-container handle space */
+            margin: 0 auto;
         }
 
-        /* PONG GAME CONTAINER: ONLY RESPONSIBLE FOR ASPECT RATIO */
+        /* PONG GAME CONTAINER: FORCES THE 3:2 ASPECT RATIO */
         .pong-game {
             position: relative;
             
@@ -158,22 +158,25 @@
             overflow: hidden;
             z-index: 2000;
         }
-        
-        /* NEW FIX: Layout for the button and skeletons */
+
+        /* BUTTON CONTAINER: Layout for button and skulls */
         .button-container {
             display: flex;
             align-items: center; 
             justify-content: center; 
-            margin-top: 3vh; /* Add space between game box and button */
+            margin-top: 3vh; 
         }
         
-        /* RESPONSIVE GAME ELEMENTS */
+        /* RESPONSIVE GAME ELEMENTS - PERFECT CIRCLE BALL FIX */
         .pong-ball {
             position: absolute;
             width: 5%; 
-            height: 5%; 
+            /* Fix: Force height to be equal to width (5% of width) for a perfect circle */
+            height: 0; 
+            padding-bottom: 5%; 
+            
             background-color: #39FF14;
-            border-radius: 2px;
+            border-radius: 50%; /* Changed from 2px to 50% for a true circle */
             box-shadow: 0 0 10px #39FF14;
         }
         
@@ -203,9 +206,10 @@
         .score-left { left: 25%; } 
         .score-right { right: 25%; }
 
-        /* RESPONSIVE BUTTON - MINIMUM SIZE INCREASED */
+        /* RESPONSIVE BUTTON - SLIMMER PADDING FIX */
         button {
-            padding: 3vw 6vw; 
+            /* Fix: Reduced vertical padding (3vw to 2vw) for a slimmer button */
+            padding: 2vw 6vw; 
             font-size: clamp(14px, 3vw, 16px); 
             position: relative;
             font-family: 'Press Start 2P', 'Courier New', cursive;
@@ -290,7 +294,7 @@
     <div class="crt-overlay"></div>
     
     <script>
-        // Pong Game Logic (All JavaScript remains unchanged as it uses virtual coordinates)
+        // Pong Game Logic 
         const ball = document.getElementById('ball');
         const paddleLeft = document.getElementById('paddleLeft');
         const paddleRight = document.getElementById('paddleRight');
@@ -477,7 +481,9 @@
                 
                 Object.assign(gameOverMessage.style, {
                     fontFamily: "'Press Start 2P', cursive",
-                    fontSize: '4vw', color: '#FF00FF', 
+                    // Adjusted size for less screen coverage, optional:
+                    fontSize: '3vw', 
+                    color: '#FF00FF', 
                     textShadow: '0 0 10px #FF00FF, 0 0 20px rgba(255, 0, 255, 0.5)',
                     marginBottom: '4vh'
                 });
