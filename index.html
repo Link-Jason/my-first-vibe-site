@@ -103,6 +103,7 @@
             left: 0;
             width: 100%;
             height: 100%;
+            touch-action: none; /* AGGRESSIVE LOCK: Added here */
             /* END FIX */
 
             display: flex;
@@ -277,7 +278,7 @@
     <p>
         WARNING: FUN IS INITIATED BY DEFIANCE.<br> 
         <span class="desktop-only">IF YOU PRESS BELOW, USE **'W'/'S' or '↑'/'↓' KEYS**.</span>
-        <span class="mobile-only">IF YOU PRESS BELOW, **DRAG YOUR FINGER** ON THE SCREEN TO MOVE THE PADDLE.</span>
+        <span class="mobile-only">IF YOU PRESS BELOW, **DRAG YOUR FINGER HORIZONTALLY** ON THE SCREEN TO MOVE THE PADDLE.</span>
         <br>BUT SERIOUSLY, DON'T PRESS THAT BUTTON!
     </p>
 
@@ -340,6 +341,7 @@
         let gameRunning = false; 
 
         // FIX: Global Touch Prevention (Most aggressive method)
+        // This is necessary to stop the mobile browser's default scroll/pull-to-refresh
         document.addEventListener('touchmove', function(e) {
             e.preventDefault();
         }, { passive: false });
@@ -370,29 +372,45 @@
         document.addEventListener('keydown', (e) => { keysPressed[e.key.toLowerCase()] = true; });
         document.addEventListener('keyup', (e) => { keysPressed[e.key.toLowerCase()] = false; });
         
+        
+        // ==============================================================
+        // *** MODIFIED FUNCTION: Uses Horizontal (X) touch for Vertical (Y) paddle control ***
         function handleTouchMove(e) {
             if (!gameRunning) return;
             e.preventDefault(); 
             
             const scaleRatio = getScaleRatio();
             const gameRect = gameContainer.getBoundingClientRect();
-            const touchY = e.touches[0].clientY; 
             
-            const relativeY = touchY - gameRect.top;
+            // KEY CHANGE: Get the horizontal touch position (clientX)
+            const touchX = e.touches[0].clientX; 
             
-            let normalizedY = relativeY / scaleRatio;
+            // Calculate X position relative to the game container
+            const relativeX = touchX - gameRect.left;
             
-            let newPaddleTop = normalizedY - (VIRTUAL_PADDLE_HEIGHT / 2);
+            // Normalize the X position to the virtual game width (0 to 600)
+            let normalizedX = relativeX / scaleRatio;
+
+            // Map the normalized X position (0-600) to a paddle Y position (0-400)
+            // This is the core logic for controlling Y with X movement.
+            let newPaddleTop = (normalizedX / VIRTUAL_GAME_WIDTH) * VIRTUAL_GAME_HEIGHT;
+
+            // Center the paddle on the mapped point
+            newPaddleTop -= (VIRTUAL_PADDLE_HEIGHT / 2);
             
+            // Clamp the paddle position to the boundaries
             newPaddleTop = Math.max(0, Math.min(VIRTUAL_GAME_HEIGHT - VIRTUAL_PADDLE_HEIGHT, newPaddleTop));
 
+            // Update the paddle's position
             paddleLeftY = newPaddleTop;
         }
 
         function setupTouchControls() {
-            gameContainer.addEventListener('touchstart', handleTouchMove, { passive: false });
+            // We use touchmove, listening across the whole game area
             gameContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
         }
+        // ==============================================================
+
 
         function updateBall() {
             ballX += ballSpeedX;
@@ -430,10 +448,13 @@
         function updatePaddles() {
             const isTouchDevice = ('ontouchstart' in window);
 
+            // DESKTOP CONTROLS (UNMODIFIED)
             if (!isTouchDevice) {
                 if (keysPressed['w'] || keysPressed['arrowup']) { paddleLeftY -= userPaddleSpeed; }
                 if (keysPressed['s'] || keysPressed['arrowdown']) { paddleLeftY += userPaddleSpeed; }
             }
+            // MOBILE CONTROL IS HANDLED ENTIRELY BY handleTouchMove.
+
             
             if (ballSpeedX > 0) { 
                 const paddleCenterY = paddleRightY + VIRTUAL_PADDLE_HEIGHT / 2;
@@ -489,7 +510,7 @@
                 document.body.appendChild(overlay);
 
                 let winner = leftScore > rightScore ? "YOU" : "THE AI";
-                let verb = leftScore > rightScore ? "WIN" : "WINS"; 
+                let verb = leftScore > rightScore ? "WIN" : "WINS"; 
                 
                 const gameOverMessage = document.createElement('div');
                 gameOverMessage.textContent = `GAME OVER. ${winner} ${verb}!`;
@@ -497,7 +518,7 @@
                 Object.assign(gameOverMessage.style, {
                     fontFamily: "'Press Start 2P', cursive",
                     fontSize: '3vw', 
-                    color: '#FF00FF', 
+                    color: '#FF00FF', 
                     textShadow: '0 0 10px #FF00FF, 0 0 20px rgba(255, 0, 255, 0.5)',
                     marginBottom: '4vh'
                 });
@@ -551,7 +572,7 @@
             if (sound) { sound.play().catch(e => {}); }
 
             const isTouchDevice = ('ontouchstart' in window);
-            if (isTouchDevice) { this.textContent = "SOUND ACTIVATED. DRAG TO CONTROL."; } 
+            if (isTouchDevice) { this.textContent = "SOUND ACTIVATED. DRAG HORIZONTALLY TO CONTROL."; } 
             else { this.textContent = "SOUND ACTIVATED. USE W/S or ARROWS."; }
 
             this.classList.add('glitch-start');
