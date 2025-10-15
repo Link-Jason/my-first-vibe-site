@@ -176,14 +176,15 @@
             margin-top: 3vh; 
         }
         
-        /* RESPONSIVE GAME ELEMENTS - REVERTED TO SQUARE BALL */
+        /* RESPONSIVE GAME ELEMENTS - FIXED SQUARE BALL */
         .pong-ball {
             position: absolute;
-            width: 5%; 
-            height: 5%; /* Reverted from padding-bottom */
+            /* Using vh ensures size is based on viewport, creating a perfect square */
+            width: 2.5vh; 
+            height: 2.5vh; 
             
             background-color: #39FF14;
-            border-radius: 2px; /* Reverted to square */
+            border-radius: 2px; 
             box-shadow: 0 0 10px #39FF14;
         }
         
@@ -338,7 +339,7 @@
         const MAX_SCORE = 5; 
         let gameRunning = false; 
 
-        // NEW FIX: Global Touch Prevention (Most aggressive method)
+        // FIX: Global Touch Prevention (Most aggressive method)
         document.addEventListener('touchmove', function(e) {
             e.preventDefault();
         }, { passive: false });
@@ -371,7 +372,6 @@
         
         function handleTouchMove(e) {
             if (!gameRunning) return;
-            // e.preventDefault() is already handled globally above, but keeping it here doesn't hurt.
             e.preventDefault(); 
             
             const scaleRatio = getScaleRatio();
@@ -421,7 +421,9 @@
             if (ballX < 0) { rightScore++; scoreRight.textContent = rightScore; if (rightScore < MAX_SCORE) { paddleSpeed += AI_SPEED_INCREMENT; resetBall(1); } checkGameOver(); }
             if (ballX > VIRTUAL_GAME_WIDTH) { leftScore++; scoreLeft.textContent = leftScore; if (leftScore < MAX_SCORE) { paddleSpeed += AI_SPEED_INCREMENT; resetBall(-1); } checkGameOver(); }
 
+            // The ball's position must still be set relative to the game container's internal dimensions
             ball.style.left = (ballX / VIRTUAL_GAME_WIDTH * 100) + '%';
+            // Since we changed the ball size to vh, we use clientHeight for positioning, but sticking to percentage positioning here is safer:
             ball.style.top = (ballY / VIRTUAL_GAME_HEIGHT * 100) + '%';
         }
 
