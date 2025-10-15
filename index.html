@@ -92,7 +92,7 @@
         }
 
         /* ======================================= */
-        /* === CORE RESPONSIVE STYLES (WITH MAX CAPS) === */
+        /* === CORE RESPONSIVE STYLES (FINAL FIX) === */
         /* ======================================= */
 
         body {
@@ -112,8 +112,8 @@
 
         h1 {
             font-family: 'Press Start 2P', 'Courier New', cursive;
-            font-size: 5vw; 
-            max-font-size: 24px; /* CAPPED SIZE */
+            /* Using clamp() ensures font stays between 14px (min) and 24px (max) */
+            font-size: clamp(14px, 5vw, 24px); 
             animation: flicker-glitch 4s linear infinite alternate; 
             text-align: center;
             color: #39FF14;
@@ -125,8 +125,7 @@
         
         p {
             font-family: 'VT323', 'Courier New', monospace;
-            font-size: 3.5vw; 
-            max-font-size: 20px; /* CAPPED SIZE */
+            font-size: clamp(12px, 3.5vw, 20px); /* Using clamp() */
             color: #00FFFF;
             line-height: 1.6;
             margin: 0 auto 3vh;
@@ -138,20 +137,19 @@
         /* RESPONSIVE PONG GAME CONTAINER - CRITICAL FIX APPLIED */
         .pong-game {
             position: relative;
-            width: 90vw; 
             
-            /* HARD CAPS: Stops growth on large screens */
+            /* Primary Width: Takes 90% of available space */
+            width: 90%; 
+            
+            /* Primary Cap: Stops growing at 600px */
             max-width: 600px; 
             
-            /* Use a height formula based on the width to maintain 3:2 ratio (400/600) */
-            /* This will respect the 600px max-width ceiling. */
-            height: calc(90vw * 0.6666); 
-            
-            max-height: 400px; /* Ensures height doesn't exceed 400px */
+            /* Aspect Ratio Trick: Set height using padding-bottom based on the 3:2 ratio (400/600 = 0.6666...) */
+            padding-bottom: 66.66%; 
+            height: 0; 
             
             min-width: 300px;
-            min-height: 200px;
-
+            
             background-color: #000000;
             border: 3px solid #39FF14;
             border-radius: 8px;
@@ -160,7 +158,8 @@
             z-index: 2000;
         }
         
-        /* RESPONSIVE GAME ELEMENTS - Using percentage relative to container */
+        /* RESPONSIVE GAME ELEMENTS - Use percentage relative to the container. 
+           These are placed absolutely inside the height:0 container. */
         .pong-ball {
             position: absolute;
             width: 5%; 
@@ -195,8 +194,7 @@
             position: absolute;
             top: 5%;
             font-family: 'Press Start 2P', cursive;
-            font-size: 3vw; 
-            max-font-size: 16px; /* CAPPED SIZE */
+            font-size: clamp(10px, 3vw, 16px); /* Using clamp() */
             color: #39FF14;
             text-shadow: 0 0 5px #39FF14;
             z-index: 10;
@@ -209,8 +207,7 @@
         /* RESPONSIVE BUTTON */
         button {
             padding: 3vw 6vw; 
-            font-size: 3vw;
-            max-font-size: 16px; /* CAPPED SIZE */
+            font-size: clamp(12px, 3vw, 16px); /* Using clamp() */
             position: relative;
             font-family: 'Press Start 2P', 'Courier New', cursive;
             background: linear-gradient(to bottom, #000000, #1a1a1a);
@@ -227,14 +224,10 @@
         
         /* RESPONSIVE SKELETONS */
         .skeleton {
-            width: 8vw;
-            height: 8vw;
-            max-width: 40px; /* CAPPED SIZE */
-            max-height: 40px;
-            font-size: 5vw;
-            max-font-size: 18px; /* CAPPED SIZE */
+            width: clamp(20px, 8vw, 40px);
+            height: clamp(20px, 8vw, 40px);
+            font-size: clamp(12px, 5vw, 18px); 
             
-            /* ... rest of skeleton styles ... */
             display: flex;
             background-color: #677872;
             border: 2px solid #39FF14;
@@ -247,17 +240,6 @@
         }
         .skeleton-left { margin-right: 25px; }
         .skeleton-right { margin-left: 25px; }
-
-        /* Media Query for Tiny Screens (Fine-tuning) */
-        @media (max-width: 480px) {
-            h1 { font-size: 6vw; margin-bottom: 2vh; }
-            p { font-size: 3.5vw; padding: 0 2vw; margin-bottom: 2vh; }
-            .score { font-size: 4vw; }
-            button { 
-                font-size: 3.5vw; 
-                padding: 3.5vw 7vw;
-            }
-        }
 
         /* Overlays (No change needed) */
         .crt-overlay, .noise-overlay {
