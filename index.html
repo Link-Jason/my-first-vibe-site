@@ -20,11 +20,11 @@
     let ballX = VIRTUAL_GAME_WIDTH / 2;
     let ballY = VIRTUAL_GAME_HEIGHT / 2;
     
-    // --- MODIFIED SPEED FOR FASTER START ---
+    // --- FASTER START SPEED KEPT ---
     const BASE_BALL_SPEED = 5; 
     let ballSpeedX = BASE_BALL_SPEED; 
     let ballSpeedY = 3; 
-    // ---------------------------------------
+    // -------------------------------
     
     let paddleLeftY = 160;
     let paddleRightY = 160;
@@ -41,11 +41,6 @@
     const MAX_SCORE = 5; 
     let gameRunning = false; 
 
-    // --- NEW DELTA TIME VARIABLES ---
-    let lastTime = 0;
-    let deltaTime = 0; 
-    // --------------------------------
-
     // FIX: Global Touch Prevention (Most aggressive method)
     document.addEventListener('touchmove', function(e) {
         e.preventDefault();
@@ -59,6 +54,9 @@
 
     function playPaddleHit(paddleElement) {
         let sound = document.getElementById('paddle-sound');
+        // Check if sound element exists before trying to play
+        if (!sound) return; 
+
         sound.pause(); 
         sound.currentTime = 0; 
         sound.playbackRate = 1 + (Math.random() * 0.5 - 0.25); 
@@ -107,11 +105,10 @@
 
 
     function updateBall() {
-        // --- DELTA TIME IMPLEMENTATION FOR MOVEMENT ---
-        const moveFactor = deltaTime * 60;
-        ballX += ballSpeedX * moveFactor;
-        ballY += ballSpeedY * moveFactor;
-        // --------------------------------------------
+        // --- MOVEMENT RESTORED TO FRAME-BASED (NO DELTA TIME) ---
+        ballX += ballSpeedX;
+        ballY += ballSpeedY;
+        // --------------------------------------------------------
 
         if (ballY <= 0 || ballY >= VIRTUAL_GAME_HEIGHT - VIRTUAL_BALL_SIZE) {
             ballSpeedY = -ballSpeedY;
@@ -144,23 +141,22 @@
 
     function updatePaddles() {
         const isTouchDevice = ('ontouchstart' in window);
-        const moveFactor = deltaTime * 60; // Delta Time movement factor
 
         // DESKTOP CONTROLS 
         if (!isTouchDevice) {
-            // --- DELTA TIME IMPLEMENTATION FOR PADDLES ---
-            if (keysPressed['w'] || keysPressed['arrowup']) { paddleLeftY -= userPaddleSpeed * moveFactor; }
-            if (keysPressed['s'] || keysPressed['arrowdown']) { paddleLeftY += userPaddleSpeed * moveFactor; }
-            // ----------------------------------------------
+            // --- MOVEMENT RESTORED TO FRAME-BASED (NO DELTA TIME) ---
+            if (keysPressed['w'] || keysPressed['arrowup']) { paddleLeftY -= userPaddleSpeed; }
+            if (keysPressed['s'] || keysPressed['arrowdown']) { paddleLeftY += userPaddleSpeed; }
+            // --------------------------------------------------------
         }
         
         // AI Paddle Movement
         if (ballSpeedX > 0) { 
             const paddleCenterY = paddleRightY + VIRTUAL_PADDLE_HEIGHT / 2;
-            // --- DELTA TIME IMPLEMENTATION FOR PADDLES ---
-            if (paddleCenterY < ballY) { paddleRightY += paddleSpeed * moveFactor; } 
-            else if (paddleCenterY > ballY) { paddleRightY -= paddleSpeed * moveFactor; }
-            // ----------------------------------------------
+            // --- MOVEMENT RESTORED TO FRAME-BASED (NO DELTA TIME) ---
+            if (paddleCenterY < ballY) { paddleRightY += paddleSpeed; } 
+            else if (paddleCenterY > ballY) { paddleRightY -= paddleSpeed; }
+            // --------------------------------------------------------
         }
         
         paddleLeftY = Math.max(0, Math.min(VIRTUAL_GAME_HEIGHT - VIRTUAL_PADDLE_HEIGHT, paddleLeftY));
@@ -185,9 +181,9 @@
         }
         
         ballSpeedX = direction * BASE_BALL_SPEED; 
-        // --- MODIFIED RESET SPEED ---
+        // --- FASTER RESET SPEED KEPT ---
         ballSpeedY = (Math.random() - 0.5) * 6; 
-        // ----------------------------
+        // -------------------------------
     }
 
     function checkGameOver() {
@@ -248,13 +244,9 @@
         }
     }
 
-    function gameLoop(currentTime) {
+    function gameLoop() { // --- RESTORED TO ORIGINAL SIGNATURE ---
         if (gameRunning) { 
-            // --- DELTA TIME CALCULATION ---
-            deltaTime = (currentTime - lastTime) / 1000;
-            lastTime = currentTime;
-            if (deltaTime > 0.1) deltaTime = 0; // Guard against massive jumps in time
-            // ------------------------------
+            // --- DELTA TIME CODE REMOVED ---
             
             updateBall();
             updatePaddles();
@@ -273,7 +265,6 @@
         
         setupTouchControls(); 
 
-        // Initialize lastTime on first frame call
         requestAnimationFrame(gameLoop);
     }
 
