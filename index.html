@@ -322,9 +322,10 @@
 
         let ballX = VIRTUAL_GAME_WIDTH / 2;
         let ballY = VIRTUAL_GAME_HEIGHT / 2;
-        const BASE_BALL_SPEED = 4;
-        let ballSpeedX = BASE_BALL_SPEED; 
-        let ballSpeedY = 2; 
+       // **New Code (For a faster start):**
+const BASE_BALL_SPEED = 5; // Increased minimum horizontal speed
+let ballSpeedX = BASE_BALL_SPEED; 
+let ballSpeedY = 3; // Increased initial vertical speed
         let paddleLeftY = 160;
         let paddleRightY = 160;
         
