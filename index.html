@@ -111,7 +111,6 @@
             top: 0;
             left: 0;
             width: 100%;
-            /* FIX: Using dvh for stable mobile height */
             height: 100dvh; 
             touch-action: none; 
 
@@ -217,10 +216,10 @@
             box-shadow: 0 0 8px #39FF14;
             width: 2.5%; 
             height: 20%; 
-            transition: height 0.2s ease-out; 
+            /* Power-paddle is removed from JS, only base height remains */
         }
         
-        /* Power-Up Paddle */
+        /* Power-Up Paddle (CSS kept but no longer used in JS) */
         .power-paddle {
             height: 40%; 
             box-shadow: 0 0 15px #FF00FF, 0 0 30px rgba(255, 0, 255, 0.7); 
@@ -258,7 +257,7 @@
         }
         .score-label-right { right: 25%; }
 
-        /* Chaos Message Style */
+        /* Chaos Message Style (CSS kept but no longer used in JS) */
         .chaos-message {
             position: absolute;
             top: 50%;
@@ -274,7 +273,7 @@
             animation: none;
         }
 
-        /* RESPONSIVE BUTTON & SKELETONS (No change) */
+        /* RESPONSIVE BUTTON & SKELETONS */
         button {
             padding: 2vw 6vw; 
             font-size: clamp(14px, 3vw, 16px); 
@@ -345,7 +344,7 @@
             <div class="score-label score-label-right" id="aiLabel">AI</div>
             <div class="score score-left">0</div>
             <div class="score score-right">0</div>
-            <div id="chaosMsg" class="chaos-message">CHAOS</div>
+            <div id="chaosMsg" class="chaos-message">CHAOS</div> 
             <div class="pong-paddle paddle-left" id="paddleLeft"></div>
             <div class="pong-paddle paddle-right" id="paddleRight"></div>
         </div>
@@ -367,7 +366,6 @@
     const scoreLeft = document.querySelector('.score-left'); 
     const scoreRight = document.querySelector('.score-right'); 
     const aiLabel = document.getElementById('aiLabel');
-    const chaosMsg = document.getElementById('chaosMsg');
     const gameContainer = document.getElementById('gameContainer'); 
     const startButton = document.getElementById('startButton');
     const skeletonLeft = document.querySelector('.skeleton-left');
@@ -381,7 +379,7 @@
 
     const BASE_BALL_SPEED = 5; 
     let ballSpeedCap = 12; 
-    const BALL_SPEED_INCREMENT_ON_HIT = 0.2; 
+    const BALL_SPEED_INCREMENT_ON_HIT = 0.2; // Speed increases retained for AI difficulty
     let paddleSpeed = 2.3;
     const AI_SPEED_INCREMENT = 0.25; 
     let userPaddleSpeed = 5; 
@@ -393,15 +391,10 @@
     const MAX_SCORE = 7;
     let gameRunning = false; 
 
-    // Ball and Chaos Management
+    // Ball Management
     let balls = [];
-    let lastScoreTime = 0;
-    let lastScorer = null;
-    let consecutiveScores = 0;
-    let paddlePowerUpTimeout; 
 
-
-    // FIX: Global Touch Prevention (Prevents mobile scroll interference)
+    // Global Touch Prevention (Prevents mobile scroll interference)
     document.addEventListener('touchmove', function(e) {
         e.preventDefault();
     }, { passive: false });
@@ -412,7 +405,7 @@
         return currentWidth / VIRTUAL_GAME_WIDTH; 
     }
 
-    // FIX: Ball Factory Function for safe object creation
+    // Ball Factory Function (Simplified: No split ball logic needed)
     function createBallObject(direction = 1) {
         return {
             x: VIRTUAL_GAME_WIDTH / 2,
@@ -430,25 +423,15 @@
         sound.playbackRate = 1 + (Math.random() * 0.5 - 0.25); 
         sound.play().catch(e => {});
 
+        // Flash and shake effects on hit
         ball.element.classList.add('flash'); 
         paddleElement.classList.add('flash');
-        
-        if (Math.abs(ball.speedX) > BASE_BALL_SPEED * 1.5) { 
-            ball.element.style.width = '4vh';
-            ball.element.style.height = '4vh';
-            ball.element.style.borderRadius = '50%';
-            
-            gameContainer.classList.add('shake-it'); 
-        }
+        gameContainer.classList.add('shake-it'); 
 
         setTimeout(() => {
             ball.element.classList.remove('flash');
             paddleElement.classList.remove('flash');
             gameContainer.classList.remove('shake-it');
-
-            ball.element.style.width = '2.5vh'; 
-            ball.element.style.height = '2.5vh'; 
-            ball.element.style.borderRadius = '2px';
         }, 100); 
     }
 
@@ -457,7 +440,7 @@
     document.addEventListener('keyup', (e) => { keysPressed[e.key.toLowerCase()] = false; });
     
     
-    // Touch control logic (Horizontal drag retained)
+    // Touch control logic 
     function handleTouchMove(e) {
         if (!gameRunning) return;
         e.preventDefault(); 
@@ -482,22 +465,16 @@
         gameContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
     }
 
-    // Ball removal function
-    function manageBallLifespan(ballElement) {
-        setTimeout(() => {
-            const ballIndex = balls.findIndex(b => b.element === ballElement);
-
-            if (ballIndex !== -1) {
-                if (balls.length > 1) {
-                    gameContainer.removeChild(ballElement);
-                    balls.splice(ballIndex, 1);
-                } 
+    // Function to spawn a new ball element (simplified)
+    function spawnBall(direction = 1) { 
+        // Before spawning a new ball, ensure all existing balls are removed (standard pong)
+        balls.forEach(ball => {
+            if (ball.element && gameContainer.contains(ball.element)) {
+                gameContainer.removeChild(ball.element);
             }
-        }, 5000); 
-    }
-
-    // Function to spawn a new ball element
-    function spawnBall(direction = 1, isSplitBall = false) { 
+        });
+        balls = [];
+        
         const newBall = createBallObject(direction); 
         
         const ballElement = document.createElement('div');
@@ -506,72 +483,8 @@
         
         newBall.element = ballElement;
         balls.push(newBall);
-
-        if (isSplitBall) {
-            manageBallLifespan(ballElement);
-        }
         
         return newBall;
-    }
-
-    // Function to check for consecutive scores and trigger split
-    function checkConsecutiveScore(scorer) {
-        const currentTime = Date.now();
-        
-        if (scorer === lastScorer && (currentTime - lastScoreTime < 5000)) { 
-            consecutiveScores++;
-        } else {
-            consecutiveScores = 1;
-        }
-
-        lastScorer = scorer;
-        lastScoreTime = currentTime;
-
-        // THE CHAOS TRIPLE SPLIT CONDITION (3 consecutive points)
-        if (consecutiveScores >= 3) {
-            if (balls.length > 0) {
-                const referenceBall = balls.sort((a, b) => Math.abs(b.speedX) - Math.abs(a.speedX))[0]; 
-                const directionX = Math.sign(referenceBall.speedX);
-                
-                // Spawn THREE split balls with varied Y speeds for chaos
-                spawnBall(-directionX, true); 
-                balls[balls.length - 1].speedY = 5; 
-
-                spawnBall(directionX, true);  
-                balls[balls.length - 1].speedY = -3; 
-
-                spawnBall(-directionX, true); 
-                balls[balls.length - 1].speedY = (Math.random() * 8) - 4; 
-                
-                // VISUAL EFFECTS:
-                chaosMsg.classList.add('show-chaos');
-                setTimeout(() => {
-                    chaosMsg.classList.remove('show-chaos');
-                }, 500); 
-
-                paddleLeft.classList.add('power-paddle');
-                paddleRight.classList.add('power-paddle');
-
-                clearTimeout(paddlePowerUpTimeout);
-                paddlePowerUpTimeout = setTimeout(() => {
-                    paddleLeft.classList.remove('power-paddle');
-                    paddleRight.classList.remove('power-paddle');
-                }, 5000); 
-
-                balls.forEach(b => {
-                    b.speedX *= 1.2; 
-                    b.speedY = b.speedY * 1.5; 
-                });
-                
-                gameContainer.classList.add('glitch-screen');
-                gameContainer.classList.add('shake-it');
-                setTimeout(() => {
-                    gameContainer.classList.remove('glitch-screen');
-                    gameContainer.classList.remove('shake-it');
-                }, 500); 
-            }
-            consecutiveScores = 0; 
-        }
     }
 
 
@@ -579,6 +492,9 @@
     function updateBalls() {
         for (let i = balls.length - 1; i >= 0; i--) {
             let ball = balls[i];
+            
+            // Only update the first (and only) ball in standard pong
+            if (i > 0) continue; 
 
             ball.x += ball.speedX;
             ball.y += ball.speedY;
@@ -592,6 +508,7 @@
             if (ball.x <= 35 && ball.y + VIRTUAL_BALL_SIZE >= paddleLeftY && ball.y <= paddleLeftY + VIRTUAL_PADDLE_HEIGHT) {
                 ball.x = 35; 
                 ball.speedX *= -1;
+                // Increase speed on hit
                 if (Math.abs(ball.speedX) < ballSpeedCap) { ball.speedX += Math.sign(ball.speedX) * BALL_SPEED_INCREMENT_ON_HIT; }
                 ball.speedY += (Math.random() - 0.5) * 1.5;
                 playPaddleHit(paddleLeft, ball); 
@@ -601,6 +518,7 @@
             if (ball.x >= VIRTUAL_GAME_WIDTH - 35 - VIRTUAL_BALL_SIZE && ball.y + VIRTUAL_BALL_SIZE >= paddleRightY && ball.y <= paddleRightY + VIRTUAL_PADDLE_HEIGHT) {
                 ball.x = VIRTUAL_GAME_WIDTH - 35 - VIRTUAL_BALL_SIZE; 
                 ball.speedX *= -1; 
+                // Increase speed on hit
                 if (Math.abs(ball.speedX) < ballSpeedCap) { ball.speedX += Math.sign(ball.speedX) * BALL_SPEED_INCREMENT_ON_HIT; }
                 ball.speedY += (Math.random() - 0.5) * 1.5;
                 playPaddleHit(paddleRight, ball); 
@@ -622,28 +540,26 @@
             }
 
             if (scored) {
-                checkConsecutiveScore(scorer);
-
+                // Remove the ball, update scores, and increase AI difficulty
                 gameContainer.removeChild(ball.element);
                 balls.splice(i, 1);
                 
                 scoreLeft.textContent = leftScore; 
                 scoreRight.textContent = rightScore; 
-                paddleSpeed += AI_SPEED_INCREMENT; 
+                paddleSpeed += AI_SPEED_INCREMENT; // AI gets harder
                 
                 // Update AI Label
-                if (scorer === 'right') {
-                    if (paddleSpeed > 4) {
-                        aiLabel.textContent = "SKR-NET";
-                        aiLabel.style.color = '#FF00FF'; 
-                    } else if (paddleSpeed > 3) {
-                        aiLabel.textContent = "DANGEROUS";
-                        aiLabel.style.color = '#39FF14'; 
-                    }
+                if (paddleSpeed > 4) {
+                    aiLabel.textContent = "SKR-NET";
+                    aiLabel.style.color = '#FF00FF'; 
+                } else if (paddleSpeed > 3) {
+                    aiLabel.textContent = "DANGEROUS";
+                    aiLabel.style.color = '#39FF14'; 
                 }
                 
                 checkGameOver(); 
 
+                // Respawn the single ball
                 if (balls.length === 0 && gameRunning) {
                     spawnBall(scorer === 'right' ? 1 : -1); 
                 }
@@ -668,8 +584,8 @@
         
         // 🤖 AI LOGIC with JITTER SMOOTHING
         if (balls.length > 0) {
-            // Find the ball moving towards the AI, or the first one if none are (for splits)
-            const targetBall = balls.find(b => b.speedX > 0) || balls[0];
+            // Target the only ball
+            const targetBall = balls[0];
 
             const paddleCenterY = paddleRightY + VIRTUAL_PADDLE_HEIGHT / 2;
             
@@ -696,6 +612,7 @@
             gameContainer.style.animation = 'none'; 
             gameContainer.style.transform = 'translate(0, 0)'; 
             
+            // Remove remaining balls
             balls.forEach(ball => {
                 if (ball.element && gameContainer.contains(ball.element)) {
                     gameContainer.removeChild(ball.element);
@@ -738,82 +655,4 @@
             playAgainButton.addEventListener('click', () => {
                 gameContainer.style.animation = ''; 
                 gameContainer.style.transform = ''; 
-                overlay.remove(); 
-                
-                // Reset state
-                leftScore = 0; rightScore = 0;
-                scoreLeft.textContent = '0'; scoreRight.textContent = '0';
-                
-                aiLabel.textContent = 'AI';
-                aiLabel.style.color = '#00FFFF';
-                
-                paddleLeftY = 160; paddleRightY = 160;
-                paddleSpeed = 2.3;
-                consecutiveScores = 0;
-                
-                paddleLeft.classList.remove('power-paddle');
-                paddleRight.classList.remove('power-paddle');
-
-                launchGame(); 
-                requestAnimationFrame(gameLoop);
-            });
-
-            overlay.appendChild(gameOverMessage);
-            overlay.appendChild(playAgainButton);
-        }
-    }
-
-    function gameLoop() {
-        if (gameRunning) { 
-            updateBalls();
-            updatePaddles();
-            requestAnimationFrame(gameLoop);
-        } 
-    }
-
-    function launchGame() {
-        gameRunning = true; 
-        
-        balls.forEach(ball => {
-            if (ball.element && gameContainer.contains(ball.element)) {
-                gameContainer.removeChild(ball.element);
-            }
-        });
-        balls = [];
-        spawnBall(1, false); 
-        
-        updatePaddles(); 
-        
-        startButton.style.display = 'none';
-        skeletonLeft.style.display = 'none';
-        skeletonRight.style.display = 'none';
-        
-        // FIX: Show scores and labels now that the game is running
-        scoreLeft.style.display = 'block';
-        scoreRight.style.display = 'block';
-        aiLabel.style.display = 'block';
-
-        setupTouchControls(); 
-    }
-
-    startButton.addEventListener('click', function startGameSequence() {
-        let sound = document.getElementById('paddle-sound'); 
-        if (sound) { sound.play().catch(e => {}); }
-
-        const isTouchDevice = ('ontouchstart' in window);
-        if (isTouchDevice) { this.textContent = "SOUND ACTIVATED. DRAG HORIZONTALLY TO CONTROL."; } 
-        else { this.textContent = "SOUND ACTIVATED. USE W/S or ARROWS."; }
-
-        this.classList.add('glitch-start');
-        
-        skeletonLeft.style.animation = 'none';
-        skeletonRight.style.animation = 'none';
-
-        launchGame(); 
-        requestAnimationFrame(gameLoop); // FIX: Ensure the loop starts!
-        
-        this.removeEventListener('click', startGameSequence);
-    });
-</script>
-</body>
-</html>
+                overlay.remove();
