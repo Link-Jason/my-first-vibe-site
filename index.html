@@ -90,29 +90,21 @@
             0% { transform: translateY(0); }
             100% { transform: translateY(2px); }
         }
-        
-        @keyframes chaos-flash {
-            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-            50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
-        }
-
-        .show-chaos {
-            animation: chaos-flash 0.5s ease-out forwards;
-        }
 
         /* ======================================= */
         /* === CORE RESPONSIVE STYLES (Final) === */
         /* ======================================= */
 
         body {
+            /* FIX: Lock the viewport to prevent mobile scrolling/address bar pop-in */
             overflow: hidden; 
             position: fixed; 
             top: 0;
             left: 0;
             width: 100%;
-            height: 100dvh; 
-            touch-action: none; 
+            height: 100%;
+            touch-action: none; /* AGGRESSIVE LOCK: Added here */
+            /* END FIX */
 
             display: flex;
             justify-content: center;
@@ -150,20 +142,6 @@
             text-align: center;
             z-index: 2001;
         }
-        
-        /* Warning Emphasis */
-        .warning-emphasis {
-            font-family: 'Press Start 2P', cursive;
-            color: #FF00FF; 
-            text-shadow: 0 0 8px #FF00FF, 0 0 15px rgba(255, 0, 255, 0.7);
-            animation: shake 0.5s infinite alternate; 
-            display: inline-block;
-        }
-
-        /* FIX: Forces the warning message onto a new line for better PC centering */
-        .instruction-wrap {
-            display: block; 
-        }
 
         /* WRAPPER: CONTROLS GLOBAL SIZE AND MAX-WIDTH (Aspect Ratio Anchor) */
         .pong-wrapper {
@@ -180,6 +158,7 @@
             padding-bottom: 66.66%; 
             height: 0; 
             
+            /* Prevents the mobile browser from scrolling the game area */
             touch-action: none; 
             
             background-color: #000000;
@@ -198,9 +177,10 @@
             margin-top: 3vh; 
         }
         
-        /* RESPONSIVE GAME ELEMENTS - Fixed size using vh */
+        /* RESPONSIVE GAME ELEMENTS - FIXED SQUARE BALL */
         .pong-ball {
             position: absolute;
+            /* Using vh ensures size is based on viewport, creating a perfect square */
             width: 2.5vh; 
             height: 2.5vh; 
             
@@ -208,7 +188,7 @@
             border-radius: 2px; 
             box-shadow: 0 0 10px #39FF14;
         }
-
+        
         .pong-paddle {
             position: absolute;
             background-color: #39FF14;
@@ -216,15 +196,8 @@
             box-shadow: 0 0 8px #39FF14;
             width: 2.5%; 
             height: 20%; 
-            /* Power-paddle is removed from JS, only base height remains */
         }
         
-        /* Power-Up Paddle (CSS kept but no longer used in JS) */
-        .power-paddle {
-            height: 40%; 
-            box-shadow: 0 0 15px #FF00FF, 0 0 30px rgba(255, 0, 255, 0.7); 
-        }
-
         .paddle-left { left: 3.33%; top: 40%; } 
         .paddle-right { right: 3.33%; top: 40%; }
 
@@ -237,43 +210,12 @@
             color: #39FF14;
             text-shadow: 0 0 5px #39FF14;
             z-index: 10;
-            display: none; /* HIDE ON STARTUP */
         }
         
         .score-left { left: 25%; } 
         .score-right { right: 25%; }
 
-        /* AI Label Style */
-        .score-label {
-            position: absolute;
-            top: 15%; 
-            font-family: 'VT323', monospace;
-            font-size: clamp(8px, 2vw, 14px); 
-            color: #00FFFF;
-            text-shadow: 0 0 3px #00FFFF;
-            z-index: 10;
-            transition: color 0.5s; 
-            display: none; /* HIDE ON STARTUP */
-        }
-        .score-label-right { right: 25%; }
-
-        /* Chaos Message Style (CSS kept but no longer used in JS) */
-        .chaos-message {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%); 
-            font-family: 'Press Start 2P', cursive;
-            font-size: clamp(20px, 6vw, 40px); 
-            color: #FF00FF; 
-            text-shadow: 0 0 10px #FF00FF, 0 0 20px rgba(255, 0, 255, 0.7);
-            z-index: 999; 
-            opacity: 0; 
-            pointer-events: none;
-            animation: none;
-        }
-
-        /* RESPONSIVE BUTTON & SKELETONS */
+        /* RESPONSIVE BUTTON */
         button {
             padding: 2vw 6vw; 
             font-size: clamp(14px, 3vw, 16px); 
@@ -285,12 +227,13 @@
             border-radius: 8px;
             cursor: pointer;
             box-shadow: 0 0 15px rgba(57, 255, 20, 0.4), 
-                         0 4px 8px rgba(0, 0, 0, 0.3),
-                         inset 0 1px 0 rgba(57, 255, 20, 0.2);
+                        0 4px 8px rgba(0, 0, 0, 0.3),
+                        inset 0 1px 0 rgba(57, 255, 20, 0.2);
             text-shadow: 0 0 5px #39FF14;
             transition: all 0.2s ease;
         }
         
+        /* RESPONSIVE SKELETONS */
         .skeleton {
             width: clamp(20px, 8vw, 40px);
             height: clamp(20px, 8vw, 40px);
@@ -333,18 +276,17 @@
     <audio id="paddle-sound" src="assets/blipsound.mp3" preload="auto"></audio>
     <h1>SHALL WE PLAY A GAME?</h1>
     <p>
-        <span class="desktop-only"><strong>KEYS:</strong> 'W'/'S' or '↑'/'↓'.</span><br>
-        <span class="mobile-only"><strong>TOUCH:</strong> DRAG HORIZONTALLY.</span>
+        <span class="desktop-only">**KEYS:** 'W'/'S' or '↑'/'↓'.</span><br>
+        <span class="mobile-only">**TOUCH:** DRAG HORIZONTALLY.</span>
         <br>
-        BUT SERIOUSLY, <span class="instruction-wrap"><span class="warning-emphasis">DON'T PRESS THAT BUTTON TO HAVE FUN!</span></span>
+        BUT SERIOUSLY, **DON'T PRESS THAT BUTTON TO HAVE FUN!**
     </p>
 
     <div class="pong-wrapper">
         <div class="pong-game" id="gameContainer">
-            <div class="score-label score-label-right" id="aiLabel">AI</div>
             <div class="score score-left">0</div>
             <div class="score score-right">0</div>
-            <div id="chaosMsg" class="chaos-message">CHAOS</div> 
+            <div class="pong-ball" id="ball"></div>
             <div class="pong-paddle paddle-left" id="paddleLeft"></div>
             <div class="pong-paddle paddle-right" id="paddleRight"></div>
         </div>
@@ -361,40 +303,42 @@
     
 <script>
     // Pong Game Logic 
+    const ball = document.getElementById('ball');
     const paddleLeft = document.getElementById('paddleLeft');
     const paddleRight = document.getElementById('paddleRight');
-    const scoreLeft = document.querySelector('.score-left'); 
-    const scoreRight = document.querySelector('.score-right'); 
-    const aiLabel = document.getElementById('aiLabel');
+    const scoreLeft = document.querySelector('.score-left');
+    const scoreRight = document.querySelector('.score-right');
     const gameContainer = document.getElementById('gameContainer'); 
     const startButton = document.getElementById('startButton');
     const skeletonLeft = document.querySelector('.skeleton-left');
     const skeletonRight = document.querySelector('.skeleton-right');
 
-    // **VIRTUAL GAME DIMENSIONS**
+    // **VIRTUAL GAME DIMENSIONS (Used for all logic/calculations)**
     const VIRTUAL_GAME_WIDTH = 600;
     const VIRTUAL_GAME_HEIGHT = 400;
     const VIRTUAL_BALL_SIZE = 20;
     const VIRTUAL_PADDLE_HEIGHT = 80;
 
+    let ballX = VIRTUAL_GAME_WIDTH / 2;
+    let ballY = VIRTUAL_GAME_HEIGHT / 2;
     const BASE_BALL_SPEED = 5; 
-    let ballSpeedCap = 12; 
-    const BALL_SPEED_INCREMENT_ON_HIT = 0.2; // Speed increases retained for AI difficulty
-    let paddleSpeed = 2.3;
-    const AI_SPEED_INCREMENT = 0.25; 
-    let userPaddleSpeed = 5; 
-    
+    let ballSpeedX = BASE_BALL_SPEED; 
+    let ballSpeedY = 2; 
     let paddleLeftY = 160;
     let paddleRightY = 160;
+    
+    let ballSpeedCap = 12; 
+    const BALL_SPEED_INCREMENT_ON_HIT = 0.2; 
+    let paddleSpeed = 2.3; // Tuned for optimal difficulty
+    const AI_SPEED_INCREMENT = 0.25; 
+    
+    let userPaddleSpeed = 5; 
     let leftScore = 0;
     let rightScore = 0;
-    const MAX_SCORE = 7;
+    const MAX_SCORE = 5; 
     let gameRunning = false; 
 
-    // Ball Management
-    let balls = [];
-
-    // Global Touch Prevention (Prevents mobile scroll interference)
+    // FIX: Global Touch Prevention
     document.addEventListener('touchmove', function(e) {
         e.preventDefault();
     }, { passive: false });
@@ -405,33 +349,19 @@
         return currentWidth / VIRTUAL_GAME_WIDTH; 
     }
 
-    // Ball Factory Function (Simplified: No split ball logic needed)
-    function createBallObject(direction = 1) {
-        return {
-            x: VIRTUAL_GAME_WIDTH / 2,
-            y: VIRTUAL_GAME_HEIGHT / 2,
-            speedX: direction * BASE_BALL_SPEED,
-            speedY: (Math.random() - 0.5) * 4,
-            element: null, 
-        };
-    }
-
-    function playPaddleHit(paddleElement, ball) {
+    function playPaddleHit(paddleElement) {
         let sound = document.getElementById('paddle-sound');
         sound.pause(); 
         sound.currentTime = 0; 
         sound.playbackRate = 1 + (Math.random() * 0.5 - 0.25); 
         sound.play().catch(e => {});
 
-        // Flash and shake effects on hit
-        ball.element.classList.add('flash'); 
+        ball.classList.add('flash');
         paddleElement.classList.add('flash');
-        gameContainer.classList.add('shake-it'); 
-
+        
         setTimeout(() => {
-            ball.element.classList.remove('flash');
+            ball.classList.remove('flash');
             paddleElement.classList.remove('flash');
-            gameContainer.classList.remove('shake-it');
         }, 100); 
     }
 
@@ -440,7 +370,7 @@
     document.addEventListener('keyup', (e) => { keysPressed[e.key.toLowerCase()] = false; });
     
     
-    // Touch control logic 
+    // *** MODIFIED FUNCTION: Uses Horizontal (X) touch for Vertical (Y) paddle control ***
     function handleTouchMove(e) {
         if (!gameRunning) return;
         e.preventDefault(); 
@@ -448,16 +378,23 @@
         const scaleRatio = getScaleRatio();
         const gameRect = gameContainer.getBoundingClientRect();
         
-        // Maps horizontal touch to vertical paddle position
+        // KEY CHANGE: Get the horizontal touch position (clientX)
         const touchX = e.touches[0].clientX; 
+        
+        // Calculate X position relative to the game container
         const relativeX = touchX - gameRect.left;
+        
+        // Normalize the X position to the virtual game width (0 to 600)
         let normalizedX = relativeX / scaleRatio;
 
+        // Map the normalized X position (0-600) to a paddle Y position (0-400)
         let newPaddleTop = (normalizedX / VIRTUAL_GAME_WIDTH) * VIRTUAL_GAME_HEIGHT;
 
+        // Center the paddle on the mapped point and clamp to boundaries
         newPaddleTop -= (VIRTUAL_PADDLE_HEIGHT / 2);
         newPaddleTop = Math.max(0, Math.min(VIRTUAL_GAME_HEIGHT - VIRTUAL_PADDLE_HEIGHT, newPaddleTop));
 
+        // Update the paddle's position
         paddleLeftY = newPaddleTop;
     }
 
@@ -465,113 +402,53 @@
         gameContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
     }
 
-    // Function to spawn a new ball element (simplified)
-    function spawnBall(direction = 1) { 
-        // Before spawning a new ball, ensure all existing balls are removed (standard pong)
-        balls.forEach(ball => {
-            if (ball.element && gameContainer.contains(ball.element)) {
-                gameContainer.removeChild(ball.element);
-            }
-        });
-        balls = [];
-        
-        const newBall = createBallObject(direction); 
-        
-        const ballElement = document.createElement('div');
-        ballElement.className = 'pong-ball';
-        gameContainer.appendChild(ballElement);
-        
-        newBall.element = ballElement;
-        balls.push(newBall);
-        
-        return newBall;
-    }
 
+    function updateBall() {
+        ballX += ballSpeedX;
+        ballY += ballSpeedY;
 
-    // Physics update function
-    function updateBalls() {
-        for (let i = balls.length - 1; i >= 0; i--) {
-            let ball = balls[i];
-            
-            // Only update the first (and only) ball in standard pong
-            if (i > 0) continue; 
-
-            ball.x += ball.speedX;
-            ball.y += ball.speedY;
-
-            // 1. Wall Collision
-            if (ball.y <= 0 || ball.y >= VIRTUAL_GAME_HEIGHT - VIRTUAL_BALL_SIZE) {
-                ball.speedY = -ball.speedY;
-            }
-
-            // 2. Paddle Collisions (Left)
-            if (ball.x <= 35 && ball.y + VIRTUAL_BALL_SIZE >= paddleLeftY && ball.y <= paddleLeftY + VIRTUAL_PADDLE_HEIGHT) {
-                ball.x = 35; 
-                ball.speedX *= -1;
-                // Increase speed on hit
-                if (Math.abs(ball.speedX) < ballSpeedCap) { ball.speedX += Math.sign(ball.speedX) * BALL_SPEED_INCREMENT_ON_HIT; }
-                ball.speedY += (Math.random() - 0.5) * 1.5;
-                playPaddleHit(paddleLeft, ball); 
-            }
-            
-            // 3. Paddle Collisions (Right)
-            if (ball.x >= VIRTUAL_GAME_WIDTH - 35 - VIRTUAL_BALL_SIZE && ball.y + VIRTUAL_BALL_SIZE >= paddleRightY && ball.y <= paddleRightY + VIRTUAL_PADDLE_HEIGHT) {
-                ball.x = VIRTUAL_GAME_WIDTH - 35 - VIRTUAL_BALL_SIZE; 
-                ball.speedX *= -1; 
-                // Increase speed on hit
-                if (Math.abs(ball.speedX) < ballSpeedCap) { ball.speedX += Math.sign(ball.speedX) * BALL_SPEED_INCREMENT_ON_HIT; }
-                ball.speedY += (Math.random() - 0.5) * 1.5;
-                playPaddleHit(paddleRight, ball); 
-            }
-
-            // 4. Scoring Logic
-            let scored = false;
-            let scorer = null;
-
-            if (ball.x < 0) { 
-                rightScore++; 
-                scorer = 'right';
-                scored = true;
-            }
-            if (ball.x > VIRTUAL_GAME_WIDTH) { 
-                leftScore++; 
-                scorer = 'left';
-                scored = true;
-            }
-
-            if (scored) {
-                // Remove the ball, update scores, and increase AI difficulty
-                gameContainer.removeChild(ball.element);
-                balls.splice(i, 1);
-                
-                scoreLeft.textContent = leftScore; 
-                scoreRight.textContent = rightScore; 
-                paddleSpeed += AI_SPEED_INCREMENT; // AI gets harder
-                
-                // Update AI Label
-                if (paddleSpeed > 4) {
-                    aiLabel.textContent = "SKR-NET";
-                    aiLabel.style.color = '#FF00FF'; 
-                } else if (paddleSpeed > 3) {
-                    aiLabel.textContent = "DANGEROUS";
-                    aiLabel.style.color = '#39FF14'; 
-                }
-                
-                checkGameOver(); 
-
-                // Respawn the single ball
-                if (balls.length === 0 && gameRunning) {
-                    spawnBall(scorer === 'right' ? 1 : -1); 
-                }
-                continue; 
-            }
-
-            // Update DOM position
-            ball.element.style.left = (ball.x / VIRTUAL_GAME_WIDTH * 100) + '%';
-            ball.element.style.top = (ball.y / VIRTUAL_GAME_HEIGHT * 100) + '%';
+        if (ballY <= 0 || ballY >= VIRTUAL_GAME_HEIGHT - VIRTUAL_BALL_SIZE) {
+            ballSpeedY = -ballSpeedY;
         }
-    }
 
+        if (ballX <= 35 && ballY + VIRTUAL_BALL_SIZE >= paddleLeftY && ballY <= paddleLeftY + VIRTUAL_PADDLE_HEIGHT) {
+            ballX = 35; 
+            ballSpeedX *= -1;
+            if (Math.abs(ballSpeedX) < ballSpeedCap) { ballSpeedX += Math.sign(ballSpeedX) * BALL_SPEED_INCREMENT_ON_HIT; }
+            ballSpeedY += (Math.random() - 0.5) * 1.5;
+            playPaddleHit(paddleLeft); 
+        }
+        
+        if (ballX >= VIRTUAL_GAME_WIDTH - 35 - VIRTUAL_BALL_SIZE && ballY + VIRTUAL_BALL_SIZE >= paddleRightY && ballY <= paddleRightY + VIRTUAL_PADDLE_HEIGHT) {
+            ballX = VIRTUAL_GAME_WIDTH - 35 - VIRTUAL_BALL_SIZE; 
+            ballSpeedX *= -1; 
+            if (Math.abs(ballSpeedX) < ballSpeedCap) { ballSpeedX += Math.sign(ballSpeedX) * BALL_SPEED_INCREMENT_ON_HIT; }
+            ballSpeedY += (Math.random() - 0.5) * 1.5;
+            playPaddleHit(paddleRight); 
+        }
+
+        if (ballX < 0) { 
+            rightScore++; 
+            scoreRight.textContent = rightScore; 
+            if (rightScore < MAX_SCORE) { 
+                paddleSpeed += AI_SPEED_INCREMENT; 
+                resetBall(1); 
+            } 
+            checkGameOver(); 
+        }
+        if (ballX > VIRTUAL_GAME_WIDTH) { 
+            leftScore++; 
+            scoreLeft.textContent = leftScore; 
+            if (leftScore < MAX_SCORE) { 
+                paddleSpeed += AI_SPEED_INCREMENT; 
+                resetBall(-1); 
+            } 
+            checkGameOver(); 
+        }
+
+        ball.style.left = (ballX / VIRTUAL_GAME_WIDTH * 100) + '%';
+        ball.style.top = (ballY / VIRTUAL_GAME_HEIGHT * 100) + '%';
+    }
 
     function updatePaddles() {
         const isTouchDevice = ('ontouchstart' in window);
@@ -582,17 +459,17 @@
             if (keysPressed['s'] || keysPressed['arrowdown']) { paddleLeftY += userPaddleSpeed; }
         }
         
-        // 🤖 AI LOGIC with JITTER SMOOTHING
-        if (balls.length > 0) {
-            // Target the only ball
-            const targetBall = balls[0];
-
+        // 🤖 UPDATED AI LOGIC (IMPERFECT)
+        if (ballSpeedX > 0) { 
             const paddleCenterY = paddleRightY + VIRTUAL_PADDLE_HEIGHT / 2;
-            
-            const movementDelta = targetBall.y - paddleCenterY;
-            
-            // Apply only 10% of the difference per frame, clamped by paddleSpeed
-            paddleRightY += Math.max(-paddleSpeed, Math.min(paddleSpeed, movementDelta * 0.1));
+            const deadzone = 5; 
+
+            if (paddleCenterY < ballY - deadzone) { 
+                paddleRightY += paddleSpeed; 
+            } 
+            else if (paddleCenterY > ballY + deadzone) { 
+                paddleRightY -= paddleSpeed; 
+            }
         }
         
         paddleLeftY = Math.max(0, Math.min(VIRTUAL_GAME_HEIGHT - VIRTUAL_PADDLE_HEIGHT, paddleLeftY));
@@ -602,6 +479,23 @@
         paddleRight.style.top = (paddleRightY / VIRTUAL_GAME_HEIGHT * 100) + '%';
     }
 
+    function resetBall(direction = 1) { 
+        ballX = VIRTUAL_GAME_WIDTH / 2;
+        ballY = VIRTUAL_GAME_HEIGHT / 2;
+        
+        if (gameRunning) { 
+            gameContainer.classList.add('glitch-screen');
+            gameContainer.classList.add('shake-it');
+
+            setTimeout(() => {
+                gameContainer.classList.remove('shake-it');
+                gameContainer.classList.remove('glitch-screen');
+            }, 500); 
+        }
+        
+        ballSpeedX = direction * BASE_BALL_SPEED; 
+        ballSpeedY = (Math.random() - 0.5) * 4; 
+    }
 
     function checkGameOver() {
         if (leftScore >= MAX_SCORE || rightScore >= MAX_SCORE) {
@@ -612,18 +506,8 @@
             gameContainer.style.animation = 'none'; 
             gameContainer.style.transform = 'translate(0, 0)'; 
             
-            // Remove remaining balls
-            balls.forEach(ball => {
-                if (ball.element && gameContainer.contains(ball.element)) {
-                    gameContainer.removeChild(ball.element);
-                }
-            });
-            balls = []; 
-
-            // Hide scores on Game Over
             scoreLeft.style.display = 'none';
             scoreRight.style.display = 'none';
-            aiLabel.style.display = 'none';
             
             const overlay = document.createElement('div');
             Object.assign(overlay.style, {
@@ -655,4 +539,61 @@
             playAgainButton.addEventListener('click', () => {
                 gameContainer.style.animation = ''; 
                 gameContainer.style.transform = ''; 
-                overlay.remove();
+                overlay.remove(); 
+                leftScore = 0; rightScore = 0;
+                scoreLeft.textContent = '0'; scoreRight.textContent = '0';
+                scoreLeft.style.display = 'block'; scoreRight.style.display = 'block';
+                paddleLeftY = 160; paddleRightY = 160;
+                paddleSpeed = 2.3; // Reset speed to the tuned value
+                resetBall();
+                gameRunning = true;
+                requestAnimationFrame(gameLoop);
+            });
+
+            overlay.appendChild(gameOverMessage);
+            overlay.appendChild(playAgainButton);
+        }
+    }
+
+    function gameLoop() {
+        if (gameRunning) { 
+            updateBall();
+            updatePaddles();
+            requestAnimationFrame(gameLoop);
+        } 
+    }
+
+    function launchGame() {
+        gameRunning = true; 
+        resetBall(); 
+        updatePaddles(); 
+        
+        startButton.style.display = 'none';
+        skeletonLeft.style.display = 'none';
+        skeletonRight.style.display = 'none';
+        
+        setupTouchControls(); 
+
+        requestAnimationFrame(gameLoop);
+    }
+
+    startButton.addEventListener('click', function startGameSequence() {
+        let sound = document.getElementById('paddle-sound'); 
+        if (sound) { sound.play().catch(e => {}); }
+
+        const isTouchDevice = ('ontouchstart' in window);
+        if (isTouchDevice) { this.textContent = "SOUND ACTIVATED. DRAG HORIZONTALLY TO CONTROL."; } 
+        else { this.textContent = "SOUND ACTIVATED. USE W/S or ARROWS."; }
+
+        this.classList.add('glitch-start');
+        
+        skeletonLeft.style.animation = 'none';
+        skeletonRight.style.animation = 'none';
+
+        launchGame(); 
+        
+        this.removeEventListener('click', startGameSequence);
+    });
+</script>
+</body>
+</html>
