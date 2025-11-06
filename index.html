@@ -91,7 +91,6 @@
             100% { transform: translateY(2px); }
         }
         
-        /* NEW: Chaos Message Animation */
         @keyframes chaos-flash {
             0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
             50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
@@ -112,7 +111,7 @@
             top: 0;
             left: 0;
             width: 100%;
-            /* FIX: Use dvh for stable mobile height */
+            /* FIX: Using dvh for stable mobile height */
             height: 100dvh; 
             touch-action: none; 
 
@@ -162,6 +161,10 @@
             display: inline-block;
         }
 
+        /* FIX: Forces the warning message onto a new line for better PC centering */
+        .instruction-wrap {
+            display: block; 
+        }
 
         /* WRAPPER: CONTROLS GLOBAL SIZE AND MAX-WIDTH (Aspect Ratio Anchor) */
         .pong-wrapper {
@@ -207,16 +210,14 @@
             box-shadow: 0 0 10px #39FF14;
         }
 
-        /* The trail classes were removed */
-
         .pong-paddle {
             position: absolute;
             background-color: #39FF14;
             border-radius: 2px;
             box-shadow: 0 0 8px #39FF14;
             width: 2.5%; 
-            height: 20%; /* Original height */
-            transition: height 0.2s ease-out; /* Added for power-up effect */
+            height: 20%; 
+            transition: height 0.2s ease-out; 
         }
         
         /* Power-Up Paddle */
@@ -237,6 +238,7 @@
             color: #39FF14;
             text-shadow: 0 0 5px #39FF14;
             z-index: 10;
+            display: none; /* HIDE ON STARTUP */
         }
         
         .score-left { left: 25%; } 
@@ -245,13 +247,14 @@
         /* AI Label Style */
         .score-label {
             position: absolute;
-            top: 15%; /* Place it below the score */
+            top: 15%; 
             font-family: 'VT323', monospace;
             font-size: clamp(8px, 2vw, 14px); 
             color: #00FFFF;
             text-shadow: 0 0 3px #00FFFF;
             z-index: 10;
             transition: color 0.5s; 
+            display: none; /* HIDE ON STARTUP */
         }
         .score-label-right { right: 25%; }
 
@@ -334,7 +337,7 @@
         <span class="desktop-only"><strong>KEYS:</strong> 'W'/'S' or '↑'/'↓'.</span><br>
         <span class="mobile-only"><strong>TOUCH:</strong> DRAG HORIZONTALLY.</span>
         <br>
-        BUT SERIOUSLY, <span class="warning-emphasis">DON'T PRESS THAT BUTTON TO HAVE FUN!</span>
+        BUT SERIOUSLY, <span class="instruction-wrap"><span class="warning-emphasis">DON'T PRESS THAT BUTTON TO HAVE FUN!</span></span>
     </p>
 
     <div class="pong-wrapper">
@@ -361,8 +364,8 @@
     // Pong Game Logic 
     const paddleLeft = document.getElementById('paddleLeft');
     const paddleRight = document.getElementById('paddleRight');
-    const scoreLeft = document.querySelector('.score-left');
-    const scoreRight = document.querySelector('.score-right');
+    const scoreLeft = document.querySelector('.score-left'); 
+    const scoreRight = document.querySelector('.score-right'); 
     const aiLabel = document.getElementById('aiLabel');
     const chaosMsg = document.getElementById('chaosMsg');
     const gameContainer = document.getElementById('gameContainer'); 
@@ -387,7 +390,7 @@
     let paddleRightY = 160;
     let leftScore = 0;
     let rightScore = 0;
-    const MAX_SCORE = 7; // Goal is 7 points
+    const MAX_SCORE = 7;
     let gameRunning = false; 
 
     // Ball and Chaos Management
@@ -398,7 +401,7 @@
     let paddlePowerUpTimeout; 
 
 
-    // FIX: Global Touch Prevention
+    // FIX: Global Touch Prevention (Prevents mobile scroll interference)
     document.addEventListener('touchmove', function(e) {
         e.preventDefault();
     }, { passive: false });
@@ -409,7 +412,7 @@
         return currentWidth / VIRTUAL_GAME_WIDTH; 
     }
 
-    // NEW FIX: Ball Factory Function (Replaces BallPrototype object)
+    // FIX: Ball Factory Function for safe object creation
     function createBallObject(direction = 1) {
         return {
             x: VIRTUAL_GAME_WIDTH / 2,
@@ -427,11 +430,9 @@
         sound.playbackRate = 1 + (Math.random() * 0.5 - 0.25); 
         sound.play().catch(e => {});
 
-        // Always flash
         ball.element.classList.add('flash'); 
         paddleElement.classList.add('flash');
         
-        // Power Hit Check
         if (Math.abs(ball.speedX) > BASE_BALL_SPEED * 1.5) { 
             ball.element.style.width = '4vh';
             ball.element.style.height = '4vh';
@@ -445,7 +446,6 @@
             paddleElement.classList.remove('flash');
             gameContainer.classList.remove('shake-it');
 
-            // Restore original size/shape
             ball.element.style.width = '2.5vh'; 
             ball.element.style.height = '2.5vh'; 
             ball.element.style.borderRadius = '2px';
@@ -457,7 +457,7 @@
     document.addEventListener('keyup', (e) => { keysPressed[e.key.toLowerCase()] = false; });
     
     
-    // Touch control logic (RETAINS HORIZONTAL DRAG WORKAROUND)
+    // Touch control logic (Horizontal drag retained)
     function handleTouchMove(e) {
         if (!gameRunning) return;
         e.preventDefault(); 
@@ -465,12 +465,11 @@
         const scaleRatio = getScaleRatio();
         const gameRect = gameContainer.getBoundingClientRect();
         
-        // Uses horizontal touch position (clientX) to control vertical paddle position
+        // Maps horizontal touch to vertical paddle position
         const touchX = e.touches[0].clientX; 
         const relativeX = touchX - gameRect.left;
         let normalizedX = relativeX / scaleRatio;
 
-        // Map X position (normalizedX) to Y position (newPaddleTop)
         let newPaddleTop = (normalizedX / VIRTUAL_GAME_WIDTH) * VIRTUAL_GAME_HEIGHT;
 
         newPaddleTop -= (VIRTUAL_PADDLE_HEIGHT / 2);
@@ -499,7 +498,7 @@
 
     // Function to spawn a new ball element
     function spawnBall(direction = 1, isSplitBall = false) { 
-        const newBall = createBallObject(direction); // Use Factory
+        const newBall = createBallObject(direction); 
         
         const ballElement = document.createElement('div');
         ballElement.className = 'pong-ball';
@@ -535,16 +534,12 @@
                 const directionX = Math.sign(referenceBall.speedX);
                 
                 // Spawn THREE split balls with varied Y speeds for chaos
-                
-                // Ball 1: Opposite X, fast Y speed
                 spawnBall(-directionX, true); 
                 balls[balls.length - 1].speedY = 5; 
 
-                // Ball 2: Same X, moderate Y speed
                 spawnBall(directionX, true);  
                 balls[balls.length - 1].speedY = -3; 
 
-                // Ball 3: Opposite X, random high Y speed
                 spawnBall(-directionX, true); 
                 balls[balls.length - 1].speedY = (Math.random() * 8) - 4; 
                 
@@ -563,10 +558,9 @@
                     paddleRight.classList.remove('power-paddle');
                 }, 5000); 
 
-                // Speed up all balls
                 balls.forEach(b => {
                     b.speedX *= 1.2; 
-                    b.speedY = b.speedY * 1.5; // Amplify the chaotic Y speed
+                    b.speedY = b.speedY * 1.5; 
                 });
                 
                 gameContainer.classList.add('glitch-screen');
@@ -576,7 +570,7 @@
                     gameContainer.classList.remove('shake-it');
                 }, 500); 
             }
-            consecutiveScores = 0; // Reset
+            consecutiveScores = 0; 
         }
     }
 
@@ -674,14 +668,14 @@
         
         // 🤖 AI LOGIC with JITTER SMOOTHING
         if (balls.length > 0) {
+            // Find the ball moving towards the AI, or the first one if none are (for splits)
             const targetBall = balls.find(b => b.speedX > 0) || balls[0];
 
             const paddleCenterY = paddleRightY + VIRTUAL_PADDLE_HEIGHT / 2;
             
-            // NEW: Smoothing logic
             const movementDelta = targetBall.y - paddleCenterY;
             
-            // Apply only a fraction of the difference, limited by paddleSpeed
+            // Apply only 10% of the difference per frame, clamped by paddleSpeed
             paddleRightY += Math.max(-paddleSpeed, Math.min(paddleSpeed, movementDelta * 0.1));
         }
         
@@ -709,6 +703,7 @@
             });
             balls = []; 
 
+            // Hide scores on Game Over
             scoreLeft.style.display = 'none';
             scoreRight.style.display = 'none';
             aiLabel.style.display = 'none';
@@ -748,8 +743,8 @@
                 // Reset state
                 leftScore = 0; rightScore = 0;
                 scoreLeft.textContent = '0'; scoreRight.textContent = '0';
-                scoreLeft.style.display = 'block'; scoreRight.style.display = 'block';
-                aiLabel.style.display = 'block'; aiLabel.textContent = 'AI';
+                
+                aiLabel.textContent = 'AI';
                 aiLabel.style.color = '#00FFFF';
                 
                 paddleLeftY = 160; paddleRightY = 160;
@@ -770,8 +765,6 @@
 
     function gameLoop() {
         if (gameRunning) { 
-            // Glitch Trail Logic was removed
-            
             updateBalls();
             updatePaddles();
             requestAnimationFrame(gameLoop);
@@ -795,6 +788,11 @@
         skeletonLeft.style.display = 'none';
         skeletonRight.style.display = 'none';
         
+        // FIX: Show scores and labels now that the game is running
+        scoreLeft.style.display = 'block';
+        scoreRight.style.display = 'block';
+        aiLabel.style.display = 'block';
+
         setupTouchControls(); 
     }
 
@@ -812,6 +810,7 @@
         skeletonRight.style.animation = 'none';
 
         launchGame(); 
+        requestAnimationFrame(gameLoop); // FIX: Ensure the loop starts!
         
         this.removeEventListener('click', startGameSequence);
     });
