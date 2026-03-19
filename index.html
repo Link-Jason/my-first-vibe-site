@@ -6,145 +6,129 @@
     <title>SHALL WE PLAY A GAME?</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <style>
-        @keyframes glitch-disappear {
-            0% { transform: translate(0); opacity: 1; text-shadow: 0 0 5px #39FF14; }
-            10% { transform: translate(5px, 5px) skewX(20deg); color: #FF00FF; }
-            20% { transform: translate(-5px, -5px) skewX(-20deg); color: #00FFFF; }
-            100% { transform: translate(0, 100px); opacity: 0; }
-        }
-        .glitch-start { animation: glitch-disappear 0.8s forwards; pointer-events: none; }
-        @keyframes screen-shake {
-            0%, 100% { transform: translate(0, 0); }
-            20% { transform: translate(-5px, -5px); }
-            60% { transform: translate(5px, 5px); }
-        }
-        .shake-it { animation: screen-shake 0.2s ease-in-out; }
-        @keyframes flicker-glitch {
-            0%, 80%, 100% { opacity: 1; transform: scale(1); }
-            81% { opacity: 0.8; transform: scale(1.01); }
-            82% { opacity: 1; }
-        }
         body {
             overflow: hidden; position: fixed; width: 100%; height: 100%;
             margin: 0; display: flex; justify-content: center; align-items: center;
             flex-direction: column; background-color: #1a1a1a; color: #39FF14;
             font-family: 'VT323', monospace; touch-action: none;
         }
-        h1 { font-family: 'Press Start 2P', cursive; font-size: 18px; text-align: center; margin-bottom: 20px; animation: flicker-glitch 3s infinite; }
+        h1 { font-family: 'Press Start 2P', cursive; font-size: clamp(12px, 4vw, 20px); text-align: center; margin-bottom: 20px; text-shadow: 0 0 10px #39FF14; }
         .pong-game {
             position: relative; width: 600px; height: 400px; background: #000;
             border: 4px solid #39FF14; box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
         }
-        @media (max-width: 650px) {
-            .pong-game { width: 90vw; height: 60vw; }
-        }
-        .pong-ball { position: absolute; width: 15px; height: 15px; background: #39FF14; box-shadow: 0 0 10px #39FF14; }
-        .pong-paddle { position: absolute; width: 10px; height: 60px; background: #39FF14; }
+        @media (max-width: 650px) { .pong-game { width: 90vw; height: 60vw; } }
+        .pong-ball { position: absolute; width: 15px; height: 15px; background: #39FF14; box-shadow: 0 0 10px #39FF14; border-radius: 2px; }
+        .pong-paddle { position: absolute; width: 10px; height: 60px; background: #39FF14; box-shadow: 0 0 8px #39FF14; }
         .paddle-left { left: 10px; }
         .paddle-right { right: 10px; }
-        .score { position: absolute; top: 20px; font-family: 'Press Start 2P'; font-size: 20px; }
-        .score-left { left: 150px; }
-        .score-right { right: 150px; }
+        .score { position: absolute; top: 20px; font-family: 'Press Start 2P'; font-size: 20px; color: rgba(57, 255, 20, 0.5); }
+        .score-left { left: 25%; }
+        .score-right { right: 25%; }
         .crt-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 4px, 3px 100%; pointer-events: none; z-index: 10;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 3px 100%; pointer-events: none; z-index: 10;
         }
         button {
-            margin-top: 20px; padding: 15px 30px; font-family: 'Press Start 2P';
+            margin-top: 20px; padding: 15px 25px; font-family: 'Press Start 2P';
             background: #000; color: #39FF14; border: 2px solid #39FF14; cursor: pointer;
+            font-size: 12px; transition: 0.2s;
         }
+        button:active { transform: scale(0.95); background: #39FF14; color: #000; }
+        @keyframes shake { 0% { transform: translate(0,0); } 25% { transform: translate(2px,2px); } 50% { transform: translate(-2px,-2px); } 100% { transform: translate(0,0); } }
+        .shake { animation: shake 0.2s ease-in-out; }
     </style>
 </head>
 <body>
     <div class="crt-overlay"></div>
     <h1>SHALL WE PLAY A GAME?</h1>
-    <div class="pong-game" id="gameContainer">
+    <div class="pong-game" id="gameArea">
         <div class="score score-left" id="sL">0</div>
         <div class="score score-right" id="sR">0</div>
-        <div class="pong-ball" id="ball" style="left: 292px; top: 192px;"></div>
-        <div class="pong-paddle paddle-left" id="pL" style="top: 170px;"></div>
-        <div class="pong-paddle paddle-right" id="pR" style="top: 170px;"></div>
+        <div class="pong-ball" id="ball"></div>
+        <div class="pong-paddle paddle-left" id="pL"></div>
+        <div class="pong-paddle paddle-right" id="pR"></div>
     </div>
-    <button id="startBtn">DO NOT PRESS THIS BUTTON!</button>
+    <button id="startBtn">START GAME</button>
 
     <script>
         const ball = document.getElementById('ball');
         const pL = document.getElementById('pL');
         const pR = document.getElementById('pR');
-        const game = document.getElementById('gameContainer');
+        const gameArea = document.getElementById('gameArea');
         const startBtn = document.getElementById('startBtn');
 
         let bX = 292, bY = 192, bSX = 4, bSY = 4;
         let pLY = 170, pRY = 170;
-        let sL = 0, sR = 0;
+        let scoreL = 0, scoreR = 0;
         let active = false;
-        let aiSpeed = 3;
+        let aiSpeed = 3.5;
 
-        startBtn.addEventListener('click', () => {
-            if(!active) {
-                active = true;
-                startBtn.classList.add('glitch-start');
-                setTimeout(() => startBtn.style.display = 'none', 800);
-                gameLoop();
-            }
+        // --- CONTROLS ---
+        // PC: W/S or Arrows
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'w' || e.key === 'ArrowUp') pLY = Math.max(0, pLY - 30);
+            if (e.key === 's' || e.key === 'ArrowDown') pLY = Math.min(340, pLY + 30);
         });
 
-        // Horizontal-to-Vertical Touch Control
+        // PHONE: Drag Horizontally to Move Vertically
         window.addEventListener('touchmove', (e) => {
             const touch = e.touches[0];
-            const rect = game.getBoundingClientRect();
-            const relX = (touch.clientX - rect.left) / rect.width;
-            pLY = (relX * 400) - 30;
-            if(pLY < 0) pLY = 0;
-            if(pLY > 340) pLY = 340;
+            const rect = gameArea.getBoundingClientRect();
+            // Map horizontal finger position (left to right) to paddle position (top to bottom)
+            let relativeX = (touch.clientX - rect.left) / rect.width;
+            pLY = relativeX * 340; 
+            if (pLY < 0) pLY = 0;
+            if (pLY > 340) pLY = 340;
             e.preventDefault();
         }, {passive: false});
 
-        // Keyboard Controls
-        window.addEventListener('keydown', (e) => {
-            if(e.key === 'w' || e.key === 'ArrowUp') pLY -= 20;
-            if(e.key === 's' || e.key === 'ArrowDown') pLY += 20;
+        startBtn.addEventListener('click', () => {
+            active = true;
+            startBtn.style.display = 'none';
+            gameLoop();
         });
 
         function gameLoop() {
-            if(!active) return;
+            if (!active) return;
 
+            // Move Ball
             bX += bSX; bY += bSY;
 
-            // AI Logic
-            let pRCenter = pRY + 30;
-            if(pRCenter < bY) pRY += aiSpeed;
+            // AI (Right Paddle)
+            let pRMid = pRY + 30;
+            if (pRMid < bY) pRY += aiSpeed;
             else pRY -= aiSpeed;
 
             // Wall Bounce
-            if(bY <= 0 || bY >= 385) {
+            if (bY <= 0 || bY >= 385) {
                 bSY *= -1;
-                game.classList.add('shake-it');
-                setTimeout(() => game.classList.remove('shake-it'), 200);
+                gameArea.classList.add('shake');
+                setTimeout(() => gameArea.classList.remove('shake'), 200);
             }
 
-            // Paddle Collision
-            if(bX <= 20 && bY > pLY && bY < pLY + 60) { bSX *= -1.1; bX = 21; }
-            if(bX >= 570 && bY > pRY && bY < pRY + 60) { bSX *= -1.1; bX = 569; }
+            // Paddle Hits
+            if (bX <= 20 && bY > pLY && bY < pLY + 60) { bSX *= -1.1; bX = 21; }
+            if (bX >= 570 && bY > pRY && bY < pRY + 60) { bSX *= -1.1; bX = 569; }
 
-            // Scoring
-            if(bX < 0) { sR++; resetBall(); aiSpeed += 0.5; }
-            if(bX > 600) { sL++; resetBall(); }
+            // Score
+            if (bX < 0) { scoreR++; reset(); aiSpeed += 0.2; }
+            if (bX > 600) { scoreL++; reset(); }
 
-            // Updates
+            // Update Visuals
             ball.style.left = bX + 'px';
             ball.style.top = bY + 'px';
             pL.style.top = pLY + 'px';
             pR.style.top = pRY + 'px';
-            document.getElementById('sL').innerText = sL;
-            document.getElementById('sR').innerText = sR;
+            document.getElementById('sL').innerText = scoreL;
+            document.getElementById('sR').innerText = scoreR;
 
             requestAnimationFrame(gameLoop);
         }
 
-        function resetBall() {
+        function reset() {
             bX = 292; bY = 192;
             bSX = Math.random() > 0.5 ? 4 : -4;
             bSY = 4;
