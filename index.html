@@ -2,322 +2,153 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SHALL WE PLAY A GAME?</title>
-
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-
     <style>
-        /* ======================================= */
-        /* === ANIMATION & UTILITY CLASSES === */
-        /* ======================================= */
         @keyframes glitch-disappear {
             0% { transform: translate(0); opacity: 1; text-shadow: 0 0 5px #39FF14; }
             10% { transform: translate(5px, 5px) skewX(20deg); color: #FF00FF; }
             20% { transform: translate(-5px, -5px) skewX(-20deg); color: #00FFFF; }
-            30% { transform: translate(10px, 0); opacity: 0.9; text-shadow: 0 0 15px #FF00FF; }
             100% { transform: translate(0, 100px); opacity: 0; }
         }
-
-        .glitch-start {
-            animation: glitch-disappear 0.8s forwards;
-            pointer-events: none;
-        }
-        
+        .glitch-start { animation: glitch-disappear 0.8s forwards; pointer-events: none; }
         @keyframes screen-shake {
             0%, 100% { transform: translate(0, 0); }
-            20% { transform: translate(-0.5%, -0.5%); }
-            40% { transform: translate(0.5%, 0.5%); }
-            60% { transform: translate(-0.5%, 0.5%); }
-            80% { transform: translate(0.5%, -0.5%); }
+            20% { transform: translate(-5px, -5px); }
+            60% { transform: translate(5px, 5px); }
         }
-
-        .shake-it {
-            animation: screen-shake 0.3s ease-out;
-        }
-
-        .pong-ball.flash, .pong-paddle.flash {
-            background-color: #FF00FF; 
-            box-shadow: 0 0 15px #FF00FF, 0 0 30px rgba(255, 0, 255, 0.7);
-            transition: background-color 0.1s, box-shadow 0.1s;
-        }
-
-        @keyframes glitch-filter {
-            0% { filter: hue-rotate(0deg) blur(0); }
-            10% { filter: hue-rotate(90deg) blur(1px); }
-            20% { filter: hue-rotate(0deg) blur(0); }
-            30% { filter: hue-rotate(180deg) blur(2px); }
-            40% { filter: hue-rotate(0deg) blur(0); }
-            50% { filter: hue-rotate(270deg) blur(1px); }
-            60% { filter: hue-rotate(0deg) blur(0); }
-            100% { filter: hue-rotate(0deg) blur(0); }
-        }
-
-        .glitch-screen {
-            animation: glitch-filter 0.5s ease-out;
-        }
-
+        .shake-it { animation: screen-shake 0.2s ease-in-out; }
         @keyframes flicker-glitch {
-            0%, 50%, 55%, 60%, 65%, 70%, 75%, 80%, 85%, 100% {
-                color: #39FF14;
-                text-shadow: 0 0 5px #39FF14, 0 0 10px rgba(57, 255, 20, 0.5);
-                transform: translate(0, 0);
-            }
-            51%, 61%, 71%, 81% {
-                text-shadow: 0 0 4px #39FF14;
-                transform: translate(1px, 0);
-            }
-            53%, 63%, 73%, 83% {
-                text-shadow: 0 0 4px #39FF14;
-                transform: translate(-1px, 0);
-            }
-            58%, 78% {
-                text-shadow: 0 0 6px #39FF14;
-                transform: translate(0.5px, 0.5px);
-            }
+            0%, 80%, 100% { opacity: 1; transform: scale(1); }
+            81% { opacity: 0.8; transform: scale(1.01); }
+            82% { opacity: 1; }
         }
-        
-        @keyframes dance {
-            0% { transform: rotate(-5deg); }
-            100% { transform: rotate(5deg); }
-        }
-        @keyframes scanlines {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(2px); }
-        }
-
-        /* ======================================= */
-        /* === CORE RESPONSIVE STYLES (Final) === */
-        /* ======================================= */
-
         body {
-            overflow: hidden; 
-            position: fixed; 
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            touch-action: none; 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            margin: 0;
-            font-family: 'VT323', 'Courier New', monospace;
-            background-color: #677872;
-            background-image: 
-                linear-gradient(90deg, rgba(57, 255, 20, 0.1) 1px, transparent 1px),
-                linear-gradient(0deg, rgba(57, 255, 20, 0.1) 1px, transparent 1px);
-            background-size: 50px 50px;
+            overflow: hidden; position: fixed; width: 100%; height: 100%;
+            margin: 0; display: flex; justify-content: center; align-items: center;
+            flex-direction: column; background-color: #1a1a1a; color: #39FF14;
+            font-family: 'VT323', monospace; touch-action: none;
         }
-
-        h1 {
-            font-family: 'Press Start 2P', 'Courier New', cursive;
-            font-size: clamp(14px, 5vw, 24px); 
-            animation: flicker-glitch 4s linear infinite alternate; 
-            text-align: center;
-            color: #39FF14;
-            text-shadow: 0 0 10px #39FF14;
-            margin-top: 0;
-            margin-bottom: 3vh; 
-            z-index: 2001;
-        }
-        
-        p {
-            font-family: 'VT323', 'Courier New', monospace;
-            font-size: clamp(12px, 3.5vw, 20px); 
-            color: #00FFFF;
-            line-height: 1.6;
-            margin: 0 auto 3vh;
-            padding: 0 5vw; 
-            text-align: center;
-            z-index: 2001;
-        }
-
-        .pong-wrapper {
-            width: 90vw;
-            max-width: 600px; 
-            margin: 0 auto;
-        }
-
+        h1 { font-family: 'Press Start 2P', cursive; font-size: 18px; text-align: center; margin-bottom: 20px; animation: flicker-glitch 3s infinite; }
         .pong-game {
-            position: relative;
-            width: 100%; 
-            padding-bottom: 66.66%; 
-            height: 0; 
-            touch-action: none; 
-            background-color: #000000;
-            border: 3px solid #39FF14;
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
-            overflow: hidden;
-            z-index: 2000;
+            position: relative; width: 600px; height: 400px; background: #000;
+            border: 4px solid #39FF14; box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
         }
-
-        .button-container {
-            display: flex;
-            align-items: center; 
-            justify-content: center; 
-            margin-top: 3vh; 
+        @media (max-width: 650px) {
+            .pong-game { width: 90vw; height: 60vw; }
         }
-        
-        .pong-ball {
-            position: absolute;
-            width: 2.5vh; 
-            height: 2.5vh; 
-            background-color: #39FF14;
-            border-radius: 2px; 
-            box-shadow: 0 0 10px #39FF14;
-        }
-        
-        .pong-paddle {
-            position: absolute;
-            background-color: #39FF14;
-            border-radius: 2px;
-            box-shadow: 0 0 8px #39FF14;
-            width: 2.5%; 
-            height: 20%; 
-        }
-        
-        .paddle-left { left: 3.33%; top: 40%; } 
-        .paddle-right { right: 3.33%; top: 40%; }
-
-        .score {
-            position: absolute;
-            top: 5%;
-            font-family: 'Press Start 2P', cursive;
-            font-size: clamp(10px, 3vw, 16px); 
-            color: #39FF14;
-            text-shadow: 0 0 5px #39FF14;
-            z-index: 10;
-        }
-        
-        .score-left { left: 25%; } 
-        .score-right { right: 25%; }
-
-        button {
-            padding: 2vw 6vw; 
-            font-size: clamp(14px, 3vw, 16px); 
-            position: relative;
-            font-family: 'Press Start 2P', 'Courier New', cursive;
-            background: linear-gradient(to bottom, #000000, #1a1a1a);
-            color: #39FF14;
-            border: 2px solid #39FF14;
-            border-radius: 8px;
-            cursor: pointer;
-            box-shadow: 0 0 15px rgba(57, 255, 20, 0.4), 
-                        0 4px 8px rgba(0, 0, 0, 0.3),
-                        inset 0 1px 0 rgba(57, 255, 20, 0.2);
-            text-shadow: 0 0 5px #39FF14;
-            transition: all 0.2s ease;
-        }
-        
-        .skeleton {
-            width: clamp(20px, 8vw, 40px);
-            height: clamp(20px, 8vw, 40px);
-            font-size: clamp(12px, 5vw, 18px); 
-            display: flex;
-            background-color: #677872;
-            border: 2px solid #39FF14;
-            border-radius: 4px;
-            align-items: center;
-            justify-content: center;
-            padding: 4px;
-            animation: dance 1s ease-in-out infinite alternate;
-            box-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
-        }
-        .skeleton-left { margin-right: 25px; }
-        .skeleton-right { margin-left: 25px; }
-
-        .crt-overlay, .noise-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 1000;
-        }
+        .pong-ball { position: absolute; width: 15px; height: 15px; background: #39FF14; box-shadow: 0 0 10px #39FF14; }
+        .pong-paddle { position: absolute; width: 10px; height: 60px; background: #39FF14; }
+        .paddle-left { left: 10px; }
+        .paddle-right { right: 10px; }
+        .score { position: absolute; top: 20px; font-family: 'Press Start 2P'; font-size: 20px; }
+        .score-left { left: 150px; }
+        .score-right { right: 150px; }
         .crt-overlay {
-            background: linear-gradient(transparent 50%, rgba(0, 255, 255, 0.15) 50%), linear-gradient(90deg, transparent 50%, rgba(0, 255, 255, 0.05) 50%);
-            background-size: 100% 2px, 4px 100%;
-            animation: scanlines 0.08s linear infinite;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%; pointer-events: none; z-index: 10;
         }
-        .noise-overlay {
-            z-index: 999;
-            opacity: 0.02;
-            background-image: radial-gradient(circle at 20% 50%, transparent 20%, rgba(255, 255, 255, 0.1) 21%, rgba(255, 255, 255, 0.1) 34%, transparent 35%, transparent), linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, 0.05) 75%, rgba(255, 255, 255, 0.05) 76%, transparent 77%, transparent);
+        button {
+            margin-top: 20px; padding: 15px 30px; font-family: 'Press Start 2P';
+            background: #000; color: #39FF14; border: 2px solid #39FF14; cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <audio id="paddle-sound" src="assets/blipsound.mp3" preload="auto"></audio>
-    <h1>SHALL WE PLAY A GAME?</h1>
-    <p>
-        <span class="desktop-only">KEYS: 'W'/'S' or '↑'/'↓'.</span><br>
-        <span class="mobile-only">TOUCH: DRAG HORIZONTALLY.</span>
-        <br>
-        BUT SERIOUSLY, DON'T PRESS THAT BUTTON TO HAVE FUN!
-    </p>
-
-    <div class="pong-wrapper">
-        <div class="pong-game" id="gameContainer">
-            <div class="score score-left">0</div>
-            <div class="score score-right">0</div>
-            <div class="pong-ball" id="ball"></div>
-            <div class="pong-paddle paddle-left" id="paddleLeft"></div>
-            <div class="pong-paddle paddle-right" id="paddleRight"></div>
-        </div>
-    </div>
-    
-    <div class="button-container">
-        <span class="skeleton skeleton-left">💀</span>
-        <button id="startButton">DO NOT PRESS THIS BUTTON!</button>
-        <span class="skeleton skeleton-right">💀</span>
-    </div>
-
-    <div class="noise-overlay"></div>
     <div class="crt-overlay"></div>
-    
-<script>
-    const ball = document.getElementById('ball');
-    const paddleLeft = document.getElementById('paddleLeft');
-    const paddleRight = document.getElementById('paddleRight');
-    const scoreLeft = document.querySelector('.score-left');
-    const scoreRight = document.querySelector('.score-right');
-    const gameContainer = document.getElementById('gameContainer'); 
-    const startButton = document.getElementById('startButton');
-    const skeletonLeft = document.querySelector('.skeleton-left');
-    const skeletonRight = document.querySelector('.skeleton-right');
+    <h1>SHALL WE PLAY A GAME?</h1>
+    <div class="pong-game" id="gameContainer">
+        <div class="score score-left" id="sL">0</div>
+        <div class="score score-right" id="sR">0</div>
+        <div class="pong-ball" id="ball" style="left: 292px; top: 192px;"></div>
+        <div class="pong-paddle paddle-left" id="pL" style="top: 170px;"></div>
+        <div class="pong-paddle paddle-right" id="pR" style="top: 170px;"></div>
+    </div>
+    <button id="startBtn">DO NOT PRESS THIS BUTTON!</button>
 
-    const VIRTUAL_GAME_WIDTH = 600;
-    const VIRTUAL_GAME_HEIGHT = 400;
-    const VIRTUAL_BALL_SIZE = 20;
-    const VIRTUAL_PADDLE_HEIGHT = 80;
+    <script>
+        const ball = document.getElementById('ball');
+        const pL = document.getElementById('pL');
+        const pR = document.getElementById('pR');
+        const game = document.getElementById('gameContainer');
+        const startBtn = document.getElementById('startBtn');
 
-    let ballX = VIRTUAL_GAME_WIDTH / 2;
-    let ballY = VIRTUAL_GAME_HEIGHT / 2;
-    const BASE_BALL_SPEED = 5; 
-    let ballSpeedX = BASE_BALL_SPEED; 
-    let ballSpeedY = 2; 
-    let paddleLeftY = 160;
-    let paddleRightY = 160;
-    let ballSpeedCap = 12; 
-    const BALL_SPEED_INCREMENT_ON_HIT = 0.2; 
-    let paddleSpeed = 2.3; 
-    const AI_SPEED_INCREMENT = 0.25; 
-    let userPaddleSpeed = 5; 
-    let leftScore = 0;
-    let rightScore = 0;
-    const MAX_SCORE = 5; 
-    let gameRunning = false; 
+        let bX = 292, bY = 192, bSX = 4, bSY = 4;
+        let pLY = 170, pRY = 170;
+        let sL = 0, sR = 0;
+        let active = false;
+        let aiSpeed = 3;
 
-    document.addEventListener('touchmove', function(e) {
-        e.preventDefault();
-    }, { passive: false });
+        startBtn.addEventListener('click', () => {
+            if(!active) {
+                active = true;
+                startBtn.classList.add('glitch-start');
+                setTimeout(() => startBtn.style.display = 'none', 800);
+                gameLoop();
+            }
+        });
 
-    function getScaleRatio() {
-        return gameContainer.offsetWidth / VIRTUAL_GAME_WIDTH; 
-    }
+        // Horizontal-to-Vertical Touch Control
+        window.addEventListener('touchmove', (e) => {
+            const touch = e.touches[0];
+            const rect = game.getBoundingClientRect();
+            const relX = (touch.clientX - rect.left) / rect.width;
+            pLY = (relX * 400) - 30;
+            if(pLY < 0) pLY = 0;
+            if(pLY > 340) pLY = 340;
+            e.preventDefault();
+        }, {passive: false});
 
-    function playPaddleHit(paddleElement) {
-        let sound = document.getElementById('paddle-sound');
-        sound.pause(); sound
+        // Keyboard Controls
+        window.addEventListener('keydown', (e) => {
+            if(e.key === 'w' || e.key === 'ArrowUp') pLY -= 20;
+            if(e.key === 's' || e.key === 'ArrowDown') pLY += 20;
+        });
+
+        function gameLoop() {
+            if(!active) return;
+
+            bX += bSX; bY += bSY;
+
+            // AI Logic
+            let pRCenter = pRY + 30;
+            if(pRCenter < bY) pRY += aiSpeed;
+            else pRY -= aiSpeed;
+
+            // Wall Bounce
+            if(bY <= 0 || bY >= 385) {
+                bSY *= -1;
+                game.classList.add('shake-it');
+                setTimeout(() => game.classList.remove('shake-it'), 200);
+            }
+
+            // Paddle Collision
+            if(bX <= 20 && bY > pLY && bY < pLY + 60) { bSX *= -1.1; bX = 21; }
+            if(bX >= 570 && bY > pRY && bY < pRY + 60) { bSX *= -1.1; bX = 569; }
+
+            // Scoring
+            if(bX < 0) { sR++; resetBall(); aiSpeed += 0.5; }
+            if(bX > 600) { sL++; resetBall(); }
+
+            // Updates
+            ball.style.left = bX + 'px';
+            ball.style.top = bY + 'px';
+            pL.style.top = pLY + 'px';
+            pR.style.top = pRY + 'px';
+            document.getElementById('sL').innerText = sL;
+            document.getElementById('sR').innerText = sR;
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function resetBall() {
+            bX = 292; bY = 192;
+            bSX = Math.random() > 0.5 ? 4 : -4;
+            bSY = 4;
+        }
+    </script>
+</body>
+</html>
