@@ -21,5 +21,4 @@ Check out the game here: [https://my-first-vibe-site.vercel.app/](https://my-fir
 * **Vanilla JavaScript:** High-performance `requestAnimationFrame` game loop.
 * **Deployment:** Hosted via Vercel with GitHub integration.
 
----
 
