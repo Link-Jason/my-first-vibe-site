@@ -22,4 +22,4 @@ Check out the game here: [https://my-first-vibe-site.vercel.app/](https://my-fir
 * **Deployment:** Hosted via Vercel with GitHub integration.
 
 ---
-*Created with 💚 and Glitches.*
+
